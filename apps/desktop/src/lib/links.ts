@@ -1,4 +1,6 @@
-// Links in the preview.
+// Links and images in the preview.
+
+import { convertFileSrc } from "@tauri-apps/api/core";
 
 /** Where a link in the preview goes. */
 export type LinkTarget =
@@ -34,4 +36,20 @@ export function classifyLink(href: string, currentPath: string): LinkTarget {
     else parts.push(part);
   }
   return { kind: "document", path: parts.join("/"), id };
+}
+
+/**
+ * The URL an image in the document at `currentPath` is loaded from. Paths
+ * are resolved like links and served from the project by the `fusen-file`
+ * protocol; `version` makes the preview reload images that changed.
+ */
+export function imageSrc(src: string, currentPath: string, version: number): string {
+  const target = classifyLink(src, currentPath);
+  if (target.kind !== "document") return src;
+  try {
+    return `${convertFileSrc(target.path, "fusen-file")}?v=${version}`;
+  } catch {
+    // Not running inside Fusen.app (`pnpm dev` in a browser).
+    return src;
+  }
 }

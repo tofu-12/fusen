@@ -1,13 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-// @ts-expect-error type error without @types/node package
 import process from "node:process";
+import pkg from "./package.json";
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [react(), tailwindcss()],
+
+  // Shown below Settings in the file list.
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
 
   // Fusen.app loads these files from disk, not over the network, so large
   // chunks (the app itself, and Mermaid's lazily loaded diagram renderers)

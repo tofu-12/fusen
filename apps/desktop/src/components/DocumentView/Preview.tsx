@@ -2,8 +2,9 @@ import type { Element, ElementContent } from "hast";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Markdown, { type Components } from "react-markdown";
 
+import { onImagesChanged } from "../../lib/commands";
 import { kindOf } from "../../lib/kinds";
-import { classifyLink } from "../../lib/links";
+import { classifyLink, imageSrc } from "../../lib/links";
 import { rehypePlugins, remarkPlugins } from "../../lib/markdown";
 import { selectionToAnchor, sourceToDomRanges } from "../../lib/sourceMap";
 import type { ViewProps } from "./DocumentView";
@@ -72,18 +73,31 @@ export default function Preview({
   const contentRef = useRef<HTMLDivElement>(null);
   const rangesRef = useRef(new Map<string, Range[]>());
   const [markers, setMarkers] = useState<Marker[]>([]);
+  const [imageVersion, setImageVersion] = useState(0);
+
+  useEffect(() => {
+    const unlisten = onImagesChanged(() => setImageVersion((v) => v + 1));
+    return () => {
+      unlisten.then((f) => f());
+    };
+  }, []);
 
   const content = useMemo(
     () => (
       <Markdown
         remarkPlugins={remarkPlugins}
         rehypePlugins={rehypePlugins(doc.content)}
-        components={components}
+        components={{
+          ...components,
+          img: ({ node, src, ...props }) => (
+            <img {...props} src={src ? imageSrc(src, doc.path, imageVersion) : src} />
+          ),
+        }}
       >
         {doc.content}
       </Markdown>
     ),
-    [doc.content],
+    [doc.content, doc.path, imageVersion],
   );
 
   const updateMarkers = useCallback(() => {

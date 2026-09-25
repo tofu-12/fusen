@@ -1,4 +1,5 @@
 mod commands;
+mod images;
 mod session;
 mod watcher;
 
@@ -101,6 +102,7 @@ pub fn run() {
             open_from_args(app, &argv);
         }))
         .plugin(tauri_plugin_opener::init())
+        .register_uri_scheme_protocol(images::PROTOCOL, images::handle)
         .manage::<AppState>(Mutex::new(None))
         .setup(|app| {
             let handle = app.handle();

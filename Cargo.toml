@@ -3,8 +3,9 @@ resolver = "3"
 members = ["crates/fusen-core", "apps/cli", "apps/desktop/src-tauri"]
 
 [workspace.package]
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
+rust-version = "1.88"
 license = "MIT"
 
 [workspace.dependencies]

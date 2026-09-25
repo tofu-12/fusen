@@ -69,5 +69,8 @@ export const onDocumentChanged = (f: (path: string) => void): Promise<UnlistenFn
 export const onShowSettings = (f: () => void): Promise<UnlistenFn> =>
   listen("show-settings", () => f());
 
+export const onImagesChanged = (f: () => void): Promise<UnlistenFn> =>
+  listen("images-changed", () => f());
+
 export const onSettingsChanged = (f: () => void): Promise<UnlistenFn> =>
   listen("settings-changed", () => f());

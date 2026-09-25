@@ -257,6 +257,9 @@ export default function MainWindow() {
                 <GearIcon />
                 Settings
               </button>
+              <div className="px-2 pt-1 text-xs text-neutral-400 dark:text-neutral-500">
+                Fusen {__APP_VERSION__}
+              </div>
             </div>
           </aside>
         )}
