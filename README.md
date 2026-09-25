@@ -149,3 +149,7 @@ Running `pnpm --filter desktop dev` alone serves the UI in a browser at `http://
 ## Tech Stack
 
 Rust + Tauri v2 + React + TypeScript
+
+## License
+
+[MIT](LICENSE)
