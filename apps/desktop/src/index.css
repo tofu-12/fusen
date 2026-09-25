@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Dark mode follows the `dark` class on <html> (see src/lib/theme.ts). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+html.dark {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased dark:bg-neutral-900 dark:text-neutral-100;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Helvetica Neue", sans-serif;
+}
+
+/* The preview's code blocks keep highlight.js colors on a light background. */
+.prose pre {
+  @apply bg-neutral-50 text-neutral-800 border border-neutral-200 dark:bg-neutral-950 dark:text-neutral-200 dark:border-neutral-800;
+}
+
+/* Show inline code as is, without the typography plugin's backticks. */
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
+.prose pre code.hljs {
+  background: transparent;
+  padding: 0;
+}
+
+.cm-editor {
+  height: 100%;
+  font-size: 13px;
+}
+
+.cm-editor .cm-scroller {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.cm-fusen-gutter {
+  width: 14px;
+}
+
+.fusen-dot {
+  width: 8px;
+  height: 8px;
+  margin: 5px 3px;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}

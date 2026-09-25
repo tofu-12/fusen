@@ -1,0 +1,9 @@
+{
+  "name": "fusen",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm --filter desktop tauri dev",
+    "build": "pnpm --filter desktop tauri build"
+  }
+}
