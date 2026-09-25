@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/fusen-core", "apps/cli"]
+members = ["crates/fusen-core", "apps/cli", "apps/desktop/src-tauri"]
 
 [workspace.package]
 version = "0.1.0"
