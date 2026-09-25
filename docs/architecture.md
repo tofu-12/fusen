@@ -76,7 +76,7 @@ fusen/
 │       │   │   ├── frontMatter.ts   # YAML front matter as a table in the preview
 │       │   │   ├── fusen.ts         # Sorting fusen and locating them in the document
 │       │   │   ├── kinds.ts         # Kind colors and palette
-│       │   │   ├── links.ts         # Targets of links in the preview
+│       │   │   ├── links.ts         # Targets of links and images in the preview
 │       │   │   ├── markdown.ts      # remark and rehype plugins for the preview
 │       │   │   ├── sourceMap.ts     # Maps selections to source line numbers
 │       │   │   └── theme.ts         # Light and dark appearance
@@ -93,6 +93,7 @@ fusen/
 │               ├── lib.rs           # App setup, menu, single window
 │               ├── session.rs       # The open project, launch arguments
 │               ├── commands.rs      # Tauri commands exposed to the UI
+│               ├── images.rs        # Images in the project, served to the preview
 │               └── watcher.rs       # File watching
 ├── docs/
 │   ├── cli.md

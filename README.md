@@ -4,11 +4,13 @@
 
 Local Markdown review tool for AI-assisted writing. Read your docs as rendered documents, stick fusen on any passage, and let AI agents act on your feedback.
 
+![Fusen UI with fusen](docs/images/fusen_ui.png)
+
 ## Install
 
 ### Requirements
 
-Fusen runs on macOS. There are no prebuilt binaries yet, so build it from source. You need [Rust](https://rustup.rs), [Node.js](https://nodejs.org), and [pnpm](https://pnpm.io).
+Fusen runs on macOS. There are no prebuilt binaries yet, so build it from source. You need [Rust](https://rustup.rs) 1.88 or later, [Node.js](https://nodejs.org) 22.12 or later, and [pnpm](https://pnpm.io) 9 or later.
 
 ### Build and install
 

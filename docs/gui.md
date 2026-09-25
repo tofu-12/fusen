@@ -19,7 +19,7 @@
 
 The left side of the window shows a tree of the Markdown files (`.md`, in any case) in the project and the directories that contain them. Click a file to open it.
 
-A button shows or hides the file list. The Settings button at the bottom of the file list opens the settings (see [4](#4-settings)).
+A button shows or hides the file list. The Settings button at the bottom of the file list opens the settings (see [4](#4-settings)). The version of Fusen is shown below it.
 
 | Launched with | Files listed | File list |
 |---|---|---|
@@ -39,7 +39,7 @@ A button switches between two views.
 
 | View | Description |
 |---|---|
-| Preview | Renders GitHub Flavored Markdown (tables, task lists, code blocks, and so on). Mermaid code blocks are rendered as diagrams. YAML front matter (between `---` lines at the top of the file) is shown as a table, as on GitHub. |
+| Preview | Renders GitHub Flavored Markdown (tables, task lists, code blocks, and so on). Mermaid code blocks are rendered as diagrams. YAML front matter (between `---` lines at the top of the file) is shown as a table, as on GitHub. Images in the project are shown too. |
 | Source | Shows the Markdown source as is, with line numbers. |
 
 - Ranges with a fusen are highlighted in the color of the fusen's kind (see [4](#4-settings)), like a sticky note on the page, and a fusen marker is shown beside the line. Colors are shown at 75% transparency. Click a highlight or marker to select its fusen. The selected fusen is highlighted in a darker color.
@@ -55,7 +55,7 @@ Clicking a link in the preview does the following, depending on the target.
 | A Markdown file in the project | `cli.md`, `../gui.md#4-settings` | Opens the file, and scrolls to the heading after `#`, if any. Files that are not in the file list are opened too. |
 | A URL | `https://example.com` | Opens the URL in the default browser. |
 
-Headings get anchors by the same rules as on GitHub, so links that work on GitHub work in Fusen too. Relative paths are resolved from the directory of the current document, and paths starting with `/` from the project root. If the target file does not exist, is outside the project, or is not a Markdown file, an error is shown at the bottom of the window.
+Headings get anchors by the same rules as on GitHub, so links that work on GitHub work in Fusen too. Relative paths are resolved from the directory of the current document, and paths starting with `/` from the project root. Image paths are resolved the same way; images outside the project are not shown, and images that change are reloaded. If the target file does not exist, is outside the project, or is not a Markdown file, an error is shown at the bottom of the window.
 
 ## 3. Fusen
 
