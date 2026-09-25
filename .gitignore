@@ -1,2 +1,15 @@
-# mac OS
+# macOS
 .DS_Store
+
+# Rust build output
+target/
+
+# JavaScript dependencies and build output
+node_modules/
+dist/
+
+# Tauri generated files
+apps/desktop/src-tauri/gen/schemas/
+
+# Fusen review files
+.fusen/
