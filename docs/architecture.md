@@ -73,6 +73,7 @@ fusen/
 │       │   │   └── Settings/        # Settings
 │       │   ├── lib/
 │       │   │   ├── commands.ts      # Tauri command calls and events
+│       │   │   ├── frontMatter.ts   # YAML front matter as a table in the preview
 │       │   │   ├── fusen.ts         # Sorting fusen and locating them in the document
 │       │   │   ├── kinds.ts         # Kind colors and palette
 │       │   │   ├── links.ts         # Targets of links in the preview
@@ -139,6 +140,7 @@ fusen/
 | Build | Vite |
 | Styling | Tailwind CSS |
 | Markdown preview | `react-markdown` + `remark-gfm` |
+| YAML front matter | `remark-frontmatter` + `yaml` |
 | Heading anchors | `rehype-slug`, using the same rules as GitHub |
 | Code block highlighting | `rehype-highlight` |
 | Mermaid diagrams | `mermaid` |

@@ -57,3 +57,8 @@ body {
   cursor: pointer;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
+
+/* Nested tables in front matter (see src/lib/frontMatter.ts). */
+.prose table.front-matter table {
+  margin: 0;
+}

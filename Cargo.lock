@@ -1278,7 +1278,7 @@ dependencies = [
 
 [[package]]
 name = "fusen"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "arboard",
  "clap",
@@ -1288,7 +1288,7 @@ dependencies = [
 
 [[package]]
 name = "fusen-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "ignore",
@@ -1304,7 +1304,7 @@ dependencies = [
 
 [[package]]
 name = "fusen-desktop"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "fusen-core",
  "notify-debouncer-mini",
