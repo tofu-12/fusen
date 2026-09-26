@@ -13,6 +13,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+arboard = { version = "3.6.1", default-features = false }
 fusen-core.workspace = true
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }

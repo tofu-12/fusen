@@ -19,7 +19,7 @@
 
 The left side of the window shows a tree of the Markdown files (`.md`, in any case) in the project and the directories that contain them. Click a file to open it.
 
-A button shows or hides the file list. The Settings button at the bottom of the file list opens the settings (see [4](#4-settings)). The version of Fusen is shown below it.
+A button shows or hides the file list. The Copy prompt button at the bottom of the file list copies the prompt for the open fusen in the listed files to the clipboard, like `fusen prompt --copy` (see the [command reference](cli.md#25-fusen-prompt-path)). The Settings button below it opens the settings (see [4](#4-settings)). The version of Fusen is shown below it.
 
 | Launched with | Files listed | File list |
 |---|---|---|
