@@ -19,6 +19,24 @@ struct Cli {
 
     /// Open a Markdown file or directory in the Fusen window
     path: Option<PathBuf>,
+
+    /// Open the path in a named window instead of the main window
+    #[arg(short, long, value_name = "NAME", requires = "path", value_parser = window_name)]
+    window: Option<String>,
+}
+
+/// Window names become part of the window label, so they are limited to
+/// letters, digits, `-` and `_`.
+fn window_name(name: &str) -> Result<String, String> {
+    let valid = !name.is_empty()
+        && name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
+    if valid {
+        Ok(name.to_string())
+    } else {
+        Err("use only letters, digits, '-' and '_'".to_string())
+    }
 }
 
 #[derive(Subcommand)]
@@ -115,7 +133,7 @@ fn main() -> ExitCode {
             }),
             _,
         ) => commands::reply::run(&file, &id, &message, author.as_deref()),
-        (None, Some(path)) => commands::open::run(&path),
+        (None, Some(path)) => commands::open::run(&path, cli.window.as_deref()),
         (None, None) => unreachable!("clap shows help without arguments"),
     };
     match result {

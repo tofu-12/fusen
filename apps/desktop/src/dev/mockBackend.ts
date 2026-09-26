@@ -1,7 +1,7 @@
 // An in-memory backend for developing the UI in a browser (`pnpm dev`),
 // used only when the page is not running inside Fusen.app.
 
-import { mockIPC } from "@tauri-apps/api/mocks";
+import { mockIPC, mockWindows } from "@tauri-apps/api/mocks";
 
 import type { DocumentState } from "../bindings/DocumentState";
 import type { FusenState } from "../bindings/FusenState";
@@ -127,6 +127,7 @@ const newId = () => `01MOCK${String(++counter).padStart(20, "0")}`;
 type Args = Record<string, unknown>;
 
 export function installMockBackend() {
+  mockWindows("main");
   mockIPC((cmd, payload) => {
     const args = (payload ?? {}) as Args;
     const doc = () => docs[args.path as string];

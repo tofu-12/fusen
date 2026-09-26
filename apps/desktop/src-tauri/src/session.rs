@@ -1,4 +1,4 @@
-//! The open project and what the window shows.
+//! The open project and what each window shows.
 
 use std::path::{Path, PathBuf};
 
@@ -41,15 +41,38 @@ impl Session {
     }
 }
 
-/// Parses `--root <dir> --path <path>` from the command line.
-pub fn parse_args(args: &[String]) -> Option<(PathBuf, PathBuf)> {
+/// The window `fusen <path>` uses when no window is named.
+pub const MAIN_WINDOW: &str = "main";
+
+/// What `fusen <path>` asked for: the project root, the path, and the label of
+/// the window to show it in.
+pub struct Request {
+    pub root: PathBuf,
+    pub path: PathBuf,
+    pub window: String,
+}
+
+/// Parses `--root <dir> --path <path> [--window <name>]` from the command line.
+pub fn parse_args(args: &[String]) -> Option<Request> {
     let value = |flag: &str| {
         args.iter()
             .position(|a| a == flag)
             .and_then(|i| args.get(i + 1))
-            .map(PathBuf::from)
     };
-    Some((value("--root")?, value("--path")?))
+    Some(Request {
+        root: PathBuf::from(value("--root")?),
+        path: PathBuf::from(value("--path")?),
+        window: window_label(value("--window").map(String::as_str)),
+    })
+}
+
+/// The label of the window named by `--window <name>`. Named windows other
+/// than `main` are labeled `sub-<name>`.
+fn window_label(name: Option<&str>) -> String {
+    match name {
+        None | Some(MAIN_WINDOW) => MAIN_WINDOW.to_string(),
+        Some(name) => format!("sub-{name}"),
+    }
 }
 
 pub fn open(root: &Path, path: &Path) -> fusen_core::Result<Session> {

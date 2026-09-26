@@ -88,7 +88,15 @@ The argument determines which files are listed and which document is opened firs
 | `fusen <file>` | `fusen docs/spec.md` | Only the file | The file (`.md`) |
 
 `fusen` exits as soon as the window opens, so you can keep working in the terminal.
-There is only one window. If it is already open, `fusen` shows the path in it instead of opening a new one. Running `fusen` from a different project root switches the window to that project.
+The path opens in the main window. If it is already open, `fusen` shows the path in it instead of opening a new one. Running `fusen` from a different project root switches the window to that project.
+
+| Option | Description |
+|---|---|
+| `-w`, `--window <name>` | Opens the path in the window named `<name>` instead of the main window. If that window is already open, the path is shown in it; otherwise a new window opens. `<name>` may contain only letters, digits, `-` and `_`, and is case-sensitive. `--window main` is the main window. |
+
+```sh
+fusen docs/spec.md --window review   # Opens or reuses the "review" window
+```
 
 ### 2.2 `fusen config [<key>] [<value>]`
 

@@ -1,5 +1,6 @@
 //! Serves images in the project to the preview through the `fusen-file`
-//! protocol. Only image files inside the open project are served.
+//! protocol. Only image files inside the project open in the requesting
+//! window are served.
 
 use std::borrow::Cow;
 use std::path::Path;
@@ -49,7 +50,7 @@ pub fn handle<R: Runtime>(
     let root = {
         let state = ctx.app_handle().state::<AppState>();
         let guard = state.lock().unwrap();
-        match guard.as_ref() {
+        match guard.get(ctx.webview_label()) {
             Some(session) => session.project.root().to_path_buf(),
             None => return not_found(),
         }
