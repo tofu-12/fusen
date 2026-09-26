@@ -5,19 +5,25 @@ use std::process::{Command, ExitCode, Stdio};
 use fusen_core::Error;
 use fusen_core::project::{Project, Target};
 
-/// `fusen <path>`: launches Fusen.app with the path and exits. If the app is
-/// already running, it receives the path through its single-instance handler.
-pub fn run(path: &Path) -> super::Result {
+/// `fusen <path> [--window <name>]`: launches Fusen.app with the path and
+/// exits. If the app is already running, it receives the path through its
+/// single-instance handler.
+pub fn run(path: &Path, window: Option<&str>) -> super::Result {
     let project = Project::current()?;
     let target = match project.resolve(path)? {
         Target::Dir(rel) | Target::File(rel) => project.root().join(rel),
     };
     let app = app_executable().ok_or(Error::AppNotFound)?;
-    Command::new(&app)
+    let mut command = Command::new(&app);
+    command
         .arg("--root")
         .arg(project.root())
         .arg("--path")
-        .arg(&target)
+        .arg(&target);
+    if let Some(window) = window {
+        command.arg("--window").arg(window);
+    }
+    command
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
