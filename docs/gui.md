@@ -164,10 +164,13 @@ Adding and changing fusen and replies is saved automatically. There is no save b
 
 ## 6. Window
 
-Fusen has only one window.
+`fusen <path>` opens the path in the main window. `fusen <path> --window <name>` opens it in a window named `<name>` instead, so you can keep several windows open side by side (see [`fusen <path>`](cli.md#21-fusen-path)).
 
-- Running `fusen <path>` while the window is open shows the path in that window instead of opening a new one.
-- Running `fusen <path>` from a different project root switches the window to that project.
+- Running `fusen <path>` while its window is open shows the path in that window instead of opening a new one.
+- Running `fusen <path>` from a different project root switches that window to the project. Other windows are not affected.
+- Each window works on its own project and updates when the files in it change.
+- Closing the main window leaves the other windows open. The next `fusen <path>` opens a new main window. Closing the last window quits Fusen.
+- Settings are shared by all windows. Choosing Settings from the menu opens them in the focused window.
 - The window title is `<name> — Fusen`, where `<name>` is the name of the project root directory.
 - If no project is open, for example when Fusen.app is opened from Finder, the window explains how to open one with `fusen`.
 - When an operation fails, for example because a fusen file is invalid, the error is shown at the bottom of the window. Click Dismiss to hide it.

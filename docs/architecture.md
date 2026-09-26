@@ -26,8 +26,8 @@ flowchart TB
 | Component | Role |
 |---|---|
 | `fusen-core` | Reads and writes fusen files ([Fusen Review Format v1](fusen-format/v1.md)) and the settings file ([Fusen Config Format v1](config-format/v1.md)), generates prompts, computes `docHash`, and finds Markdown files. All logic shared by the CLI and the app lives here. |
-| `fusen` (`apps/cli`) | The `fusen` command ([command reference](cli.md)). `fusen <path>` launches Fusen.app with `--root <dir> --path <path>` and exits; if Fusen.app is already running, `tauri-plugin-single-instance` passes the arguments to it. The app is looked up in `$FUSEN_APP`, then `/Applications` and `~/Applications`. All other commands run without Fusen.app. |
-| Tauri app | The Rust side of Fusen.app. Exposes `fusen-core` to the UI as Tauri commands, and notifies the UI of file changes through events. |
+| `fusen` (`apps/cli`) | The `fusen` command ([command reference](cli.md)). `fusen <path>` launches Fusen.app with `--root <dir> --path <path>` (and `--window <name>` if given) and exits; if Fusen.app is already running, `tauri-plugin-single-instance` passes the arguments to it. The app is looked up in `$FUSEN_APP`, then `/Applications` and `~/Applications`. All other commands run without Fusen.app. |
+| Tauri app | The Rust side of Fusen.app. Keeps the open project of each window, exposes `fusen-core` to the UI as Tauri commands, and notifies the windows showing a project of file changes through events. |
 | UI | The screens of Fusen.app ([window reference](gui.md)): the Markdown view, fusen, and settings. |
 
 ## 2. Directory structure
@@ -87,10 +87,10 @@ fusen/
 │           ├── Cargo.toml
 │           ├── build.rs
 │           ├── tauri.conf.json
-│           ├── capabilities/        # Permissions of the window
+│           ├── capabilities/        # Permissions of the windows
 │           └── src/
 │               ├── main.rs
-│               ├── lib.rs           # App setup, menu, single window
+│               ├── lib.rs           # App setup, menu, windows
 │               ├── session.rs       # The open project, launch arguments
 │               ├── commands.rs      # Tauri commands exposed to the UI
 │               ├── images.rs        # Images in the project, served to the preview
@@ -128,7 +128,7 @@ fusen/
 | Purpose | Library |
 |---|---|
 | App framework | Tauri v2 |
-| Single window | `tauri-plugin-single-instance` |
+| Single app instance | `tauri-plugin-single-instance` |
 | File watching | `notify-debouncer-mini` (`notify`) |
 | Opening URLs in the browser | `tauri-plugin-opener` |
 
