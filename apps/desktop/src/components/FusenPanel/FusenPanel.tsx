@@ -217,7 +217,7 @@ function NewFusen({
   useEffect(() => textarea.current?.focus(), [composer]);
 
   const save = async () => {
-    if (!body.trim() || saving) return;
+    if (saving) return;
     setSaving(true);
     try {
       const fusen = await api.addFusen({
@@ -256,7 +256,7 @@ function NewFusen({
         </button>
         <button
           className="rounded bg-sky-600 px-3 py-1 text-sm text-white hover:bg-sky-700 disabled:opacity-50"
-          disabled={!body.trim() || saving}
+          disabled={saving}
           onClick={save}
         >
           Save

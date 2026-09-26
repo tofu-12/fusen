@@ -102,7 +102,6 @@ export default function FusenCard({
   };
 
   const saveEdit = () =>
-    editBody.trim() &&
     run(async () => {
       await api.editFusen(path, fusen.id, editKind, editBody);
       setEditing(false);
@@ -169,17 +168,15 @@ export default function FusenCard({
             <button className="rounded px-3 py-1 text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => setEditing(false)}>
               Cancel
             </button>
-            <button
-              className="rounded bg-sky-600 px-3 py-1 text-sm text-white hover:bg-sky-700 disabled:opacity-50"
-              disabled={!editBody.trim()}
-              onClick={saveEdit}
-            >
+            <button className="rounded bg-sky-600 px-3 py-1 text-sm text-white hover:bg-sky-700" onClick={saveEdit}>
               Save
             </button>
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-sm whitespace-pre-wrap text-neutral-900 dark:text-neutral-100">{fusen.body}</p>
+        fusen.body && (
+          <p className="mt-2 text-sm whitespace-pre-wrap text-neutral-900 dark:text-neutral-100">{fusen.body}</p>
+        )
       )}
 
       {fusen.replies.length > 0 && (

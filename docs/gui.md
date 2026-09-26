@@ -63,7 +63,7 @@ Headings get anchors by the same rules as on GitHub, so links that work on GitHu
 
 1. Select text in the document, in either the preview or the source view.
 2. Choose a kind of fusen (see [4](#4-settings)) from the buttons that appear.
-3. Write the text of the fusen and save it.
+3. Write the text of the fusen and save it. The text may be left empty, to only mark the passage.
 
 To add a fusen on the whole document, click "Add fusen to document" at the top right of the document.
 

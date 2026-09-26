@@ -76,7 +76,7 @@ const TAGS: &str = r#"The fusen are structured as follows:
   - scope="selection": The fusen refers to the text in <quote>.
   - scope="document": The fusen refers to the whole document. It has no <quote>.
 - <quote location="path:line">: The exact source text the fusen refers to, and where it is.
-- <body>: The text of the fusen.
+- <body>: The text of the fusen. A fusen with no text has no <body>; handle its quote according to its kind.
 - <reply author="...">: A reply to the fusen, in chronological order."#;
 
 const REPLY_FORMAT: &str =
@@ -154,7 +154,9 @@ fn render_fusen(out: &mut String, path: &str, fusen: &Fusen, state: State) {
         let attr = format!("location=\"{}\"", location(path, Some(anchor.lines)));
         element(out, "quote", &attr, &anchor.quote);
     }
-    element(out, "body", "", &fusen.body);
+    if !fusen.body.is_empty() {
+        element(out, "body", "", &fusen.body);
+    }
     for reply in &fusen.replies {
         element(
             out,
