@@ -7,8 +7,10 @@ use std::time::Duration;
 use fusen_core::project::Project;
 use notify_debouncer_mini::notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{Debouncer, new_debouncer};
-use tauri::{AppHandle, Emitter};
+use serde::Serialize;
+use tauri::{AppHandle, Emitter, Manager};
 
+use crate::commands::AppState;
 use crate::images;
 
 pub type Watcher = Debouncer<RecommendedWatcher>;
@@ -21,7 +23,7 @@ pub const IMAGES_CHANGED: &str = "images-changed";
 
 /// Watches a project. Changes to Markdown files and fusen files are sent as
 /// `document-changed` (with the document path) and `files-changed`, and
-/// changes to images as `images-changed`.
+/// changes to images as `images-changed`, to the windows showing the project.
 pub fn watch_project(
     app: &AppHandle,
     project: &Project,
@@ -32,7 +34,7 @@ pub fn watch_project(
         let Ok(events) = res else { return };
         let events: Vec<notify_debouncer_mini::DebouncedEvent> = events;
         if events.iter().any(|e| images::media_type(&e.path).is_some()) {
-            let _ = app.emit(IMAGES_CHANGED, ());
+            emit_to_project(&app, &project_for_events, IMAGES_CHANGED, ());
         }
         let docs: BTreeSet<String> = events
             .iter()
@@ -46,14 +48,34 @@ pub fn watch_project(
             return;
         }
         for doc in docs {
-            let _ = app.emit(DOCUMENT_CHANGED, doc);
+            emit_to_project(&app, &project_for_events, DOCUMENT_CHANGED, doc);
         }
-        let _ = app.emit(FILES_CHANGED, ());
+        emit_to_project(&app, &project_for_events, FILES_CHANGED, ());
     })?;
     debouncer
         .watcher()
         .watch(project.root(), RecursiveMode::Recursive)?;
     Ok(debouncer)
+}
+
+/// Sends an event to every window showing the project.
+fn emit_to_project<S: Serialize + Clone>(
+    app: &AppHandle,
+    project: &Project,
+    event: &str,
+    payload: S,
+) {
+    let labels: Vec<String> = app
+        .state::<AppState>()
+        .lock()
+        .unwrap()
+        .iter()
+        .filter(|(_, session)| &session.project == project)
+        .map(|(label, _)| label.clone())
+        .collect();
+    for label in labels {
+        let _ = app.emit_to(label.as_str(), event, payload.clone());
+    }
 }
 
 /// Watches the directory of the settings file and sends `settings-changed`.

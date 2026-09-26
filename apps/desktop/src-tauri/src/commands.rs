@@ -1,5 +1,6 @@
 //! Tauri commands exposed to the UI. They only call fusen-core.
 
+use std::collections::HashMap;
 use std::sync::Mutex;
 
 use fusen_core::config::{Config, Settings};
@@ -7,12 +8,13 @@ use fusen_core::fusen::ops::{self, DocumentState, NewAnchor};
 use fusen_core::fusen::{Fusen, Status};
 use fusen_core::project::Project;
 use serde::Serialize;
-use tauri::State;
+use tauri::{State, Webview};
 use ts_rs::TS;
 
 use crate::session::{Session, SessionInfo};
 
-pub type AppState = Mutex<Option<Session>>;
+/// The session of each window, by window label.
+pub type AppState = Mutex<HashMap<String, Session>>;
 
 type Result<T> = std::result::Result<T, String>;
 
@@ -25,12 +27,14 @@ pub struct FileEntry {
     pub outdated_count: u32,
 }
 
+/// Runs `f` with the session of the window that called the command.
 fn with_project<T>(
     state: &State<AppState>,
+    webview: &Webview,
     f: impl FnOnce(&Project, &Session) -> fusen_core::Result<T>,
 ) -> Result<T> {
     let guard = state.lock().unwrap();
-    let session = guard.as_ref().ok_or("no project is open")?;
+    let session = guard.get(webview.label()).ok_or("no project is open")?;
     f(&session.project, session).map_err(|e| e.to_string())
 }
 
@@ -40,13 +44,17 @@ fn doc(project: &Project, path: &str) -> fusen_core::Result<String> {
 }
 
 #[tauri::command]
-pub fn get_session(state: State<AppState>) -> Option<SessionInfo> {
-    state.lock().unwrap().as_ref().map(Session::info)
+pub fn get_session(state: State<AppState>, webview: Webview) -> Option<SessionInfo> {
+    state
+        .lock()
+        .unwrap()
+        .get(webview.label())
+        .map(Session::info)
 }
 
 #[tauri::command]
-pub fn list_files(state: State<AppState>) -> Result<Vec<FileEntry>> {
-    with_project(&state, |project, session| {
+pub fn list_files(state: State<AppState>, webview: Webview) -> Result<Vec<FileEntry>> {
+    with_project(&state, &webview, |project, session| {
         Ok(project
             .markdown_files(&session.target)
             .into_iter()
@@ -67,13 +75,17 @@ pub fn list_files(state: State<AppState>) -> Result<Vec<FileEntry>> {
 /// Checks that a link target is a Markdown file in the project, and returns
 /// its path relative to the project root.
 #[tauri::command]
-pub fn resolve_document(state: State<AppState>, path: String) -> Result<String> {
-    with_project(&state, |project, _| doc(project, &path))
+pub fn resolve_document(state: State<AppState>, webview: Webview, path: String) -> Result<String> {
+    with_project(&state, &webview, |project, _| doc(project, &path))
 }
 
 #[tauri::command]
-pub fn read_document(state: State<AppState>, path: String) -> Result<DocumentState> {
-    with_project(&state, |project, _| {
+pub fn read_document(
+    state: State<AppState>,
+    webview: Webview,
+    path: String,
+) -> Result<DocumentState> {
+    with_project(&state, &webview, |project, _| {
         ops::read_document(project, &doc(project, &path)?)
     })
 }
@@ -81,13 +93,14 @@ pub fn read_document(state: State<AppState>, path: String) -> Result<DocumentSta
 #[tauri::command]
 pub fn add_fusen(
     state: State<AppState>,
+    webview: Webview,
     path: String,
     doc_hash: String,
     kind: String,
     body: String,
     anchor: Option<NewAnchor>,
 ) -> Result<Fusen> {
-    with_project(&state, |project, _| {
+    with_project(&state, &webview, |project, _| {
         ops::add_fusen(
             project,
             &doc(project, &path)?,
@@ -102,19 +115,25 @@ pub fn add_fusen(
 #[tauri::command]
 pub fn edit_fusen(
     state: State<AppState>,
+    webview: Webview,
     path: String,
     id: String,
     kind: String,
     body: String,
 ) -> Result<()> {
-    with_project(&state, |project, _| {
+    with_project(&state, &webview, |project, _| {
         ops::edit_fusen(project, &doc(project, &path)?, &id, &kind, &body)
     })
 }
 
 #[tauri::command]
-pub fn delete_fusen(state: State<AppState>, path: String, ids: Vec<String>) -> Result<()> {
-    with_project(&state, |project, _| {
+pub fn delete_fusen(
+    state: State<AppState>,
+    webview: Webview,
+    path: String,
+    ids: Vec<String>,
+) -> Result<()> {
+    with_project(&state, &webview, |project, _| {
         ops::delete_fusen(project, &doc(project, &path)?, &ids)
     })
 }
@@ -122,6 +141,7 @@ pub fn delete_fusen(state: State<AppState>, path: String, ids: Vec<String>) -> R
 #[tauri::command]
 pub fn set_status(
     state: State<AppState>,
+    webview: Webview,
     path: String,
     ids: Vec<String>,
     status: Status,
@@ -130,7 +150,7 @@ pub fn set_status(
     if ids.is_empty() {
         return Ok(());
     }
-    with_project(&state, |project, _| {
+    with_project(&state, &webview, |project, _| {
         for result in ops::set_status(project, &doc(project, &path)?, &ids, status)? {
             result?;
         }
@@ -139,8 +159,14 @@ pub fn set_status(
 }
 
 #[tauri::command]
-pub fn add_reply(state: State<AppState>, path: String, id: String, body: String) -> Result<()> {
-    with_project(&state, |project, _| {
+pub fn add_reply(
+    state: State<AppState>,
+    webview: Webview,
+    path: String,
+    id: String,
+    body: String,
+) -> Result<()> {
+    with_project(&state, &webview, |project, _| {
         let author = Config::load_default()?.user_name();
         ops::add_reply(project, &doc(project, &path)?, &id, &author, &body).map(|_| ())
     })

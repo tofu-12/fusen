@@ -2,7 +2,8 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { listen, type EventCallback, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 import type { DocumentState } from "../bindings/DocumentState";
 import type { FileEntry } from "../bindings/FileEntry";
@@ -57,20 +58,27 @@ export const saveSettings = (settings: Settings) =>
   invoke<void>("save_settings", { settings });
 
 // Events sent from src-tauri (see watcher.rs and lib.rs).
+
+// Listens to an event sent to this window only. A global `listen` would also
+// receive events sent to the other windows.
+const listenHere = <T>(event: string, f: EventCallback<T>): Promise<UnlistenFn> =>
+  getCurrentWebviewWindow().listen<T>(event, f);
+
 export const onOpenTarget = (f: (info: SessionInfo) => void): Promise<UnlistenFn> =>
-  listen<SessionInfo>("open-target", (e) => f(e.payload));
+  listenHere<SessionInfo>("open-target", (e) => f(e.payload));
 
 export const onFilesChanged = (f: () => void): Promise<UnlistenFn> =>
-  listen("files-changed", () => f());
+  listenHere("files-changed", () => f());
 
 export const onDocumentChanged = (f: (path: string) => void): Promise<UnlistenFn> =>
-  listen<string>("document-changed", (e) => f(e.payload));
+  listenHere<string>("document-changed", (e) => f(e.payload));
 
 export const onShowSettings = (f: () => void): Promise<UnlistenFn> =>
-  listen("show-settings", () => f());
+  listenHere("show-settings", () => f());
 
 export const onImagesChanged = (f: () => void): Promise<UnlistenFn> =>
-  listen("images-changed", () => f());
+  listenHere("images-changed", () => f());
 
+// Sent to every window.
 export const onSettingsChanged = (f: () => void): Promise<UnlistenFn> =>
   listen("settings-changed", () => f());

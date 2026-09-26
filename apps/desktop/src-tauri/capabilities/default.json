@@ -1,9 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the Fusen window",
+  "description": "Capability for the Fusen windows",
   "windows": [
-    "main"
+    "main",
+    "sub-*"
   ],
   "permissions": [
     "core:default",
