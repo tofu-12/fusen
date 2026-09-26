@@ -210,6 +210,7 @@ pub fn run() {
             commands::delete_fusen,
             commands::set_status,
             commands::add_reply,
+            commands::copy_prompt,
             commands::get_settings,
             commands::save_settings,
             commands::default_settings,

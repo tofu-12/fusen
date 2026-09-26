@@ -104,9 +104,6 @@ pub fn add_fusen(
     body: &str,
     anchor: Option<NewAnchor>,
 ) -> Result<Fusen> {
-    if body.trim().is_empty() {
-        return Err(Error::EmptyBody);
-    }
     if !is_valid_kind_id(kind) {
         return Err(Error::InvalidKindId(kind.to_string()));
     }
@@ -128,7 +125,7 @@ pub fn add_fusen(
         id: new_id(),
         kind: kind.to_string(),
         status: Status::Open,
-        body: body.to_string(),
+        body: fusen_body(body),
         anchor,
         doc_hash: doc_hash_at_add,
         created_at: now(),
@@ -144,18 +141,25 @@ pub fn add_fusen(
 
 /// Changes the kind and text of a fusen.
 pub fn edit_fusen(project: &Project, doc: &str, id: &str, kind: &str, body: &str) -> Result<()> {
-    if body.trim().is_empty() {
-        return Err(Error::EmptyBody);
-    }
     if !is_valid_kind_id(kind) {
         return Err(Error::InvalidKindId(kind.to_string()));
     }
     FusenFile::update(&project.fusen_path(doc), doc, |file| {
         let fusen = file.find_mut(id).ok_or_else(|| not_found(id, doc))?;
         fusen.kind = kind.to_string();
-        fusen.body = body.to_string();
+        fusen.body = fusen_body(body);
         Ok(())
     })
+}
+
+/// The text of a fusen may be empty, such as a fusen that only marks a
+/// passage. Text with only whitespace counts as empty.
+fn fusen_body(body: &str) -> String {
+    if body.trim().is_empty() {
+        String::new()
+    } else {
+        body.to_string()
+    }
 }
 
 /// Deletes fusen and their replies. `ids` are full IDs.

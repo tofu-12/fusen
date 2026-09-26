@@ -10,7 +10,7 @@ import DocumentView from "./components/DocumentView/DocumentView";
 import FileTree from "./components/FileTree/FileTree";
 import FusenPanel, { type Composer } from "./components/FusenPanel/FusenPanel";
 import SettingsView from "./components/Settings/SettingsView";
-import { GearIcon } from "./components/icons";
+import { CheckIcon, CopyIcon, GearIcon } from "./components/icons";
 import * as api from "./lib/commands";
 import { locate } from "./lib/fusen";
 import type { LinkTarget } from "./lib/links";
@@ -38,6 +38,8 @@ export default function MainWindow() {
   const [settingsDirty, setSettingsDirty] = useState(false);
   // What to do after the user agrees to discard unsaved settings.
   const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
+  // The result of the last Copy, shown on the button for a moment.
+  const [copyResult, setCopyResult] = useState<"copied" | "empty" | null>(null);
 
   const currentPathRef = useRef(currentPath);
   currentPathRef.current = currentPath;
@@ -163,6 +165,18 @@ export default function MainWindow() {
       .catch((e) => report(`Cannot open the link: ${e}`));
   };
 
+  useEffect(() => {
+    if (!copyResult) return;
+    const timer = setTimeout(() => setCopyResult(null), 1500);
+    return () => clearTimeout(timer);
+  }, [copyResult]);
+
+  const copyPrompt = () =>
+    api
+      .copyPrompt()
+      .then((copied) => setCopyResult(copied ? "copied" : "empty"))
+      .catch(report);
+
   /** Leaves the settings, asking first if there are unsaved changes. */
   const leaveSettings = (then: () => void) => {
     if (showSettings && settingsDirty) {
@@ -246,6 +260,14 @@ export default function MainWindow() {
               <FileTree files={files} current={currentPath} onOpen={openFile} />
             </div>
             <div className="border-t border-neutral-200 p-2 dark:border-neutral-800">
+              <button
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                title="Copy the prompt for the open fusen to the clipboard"
+                onClick={copyPrompt}
+              >
+                {copyResult === "copied" ? <CheckIcon /> : <CopyIcon />}
+                {copyResult === "copied" ? "Copied" : copyResult === "empty" ? "No open fusen" : "Copy prompt"}
+              </button>
               <button
                 className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm ${
                   showSettings

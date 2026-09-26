@@ -50,6 +50,9 @@ export const setStatus = (path: string, ids: string[], status: Status) =>
 export const addReply = (path: string, id: string, body: string) =>
   invoke<void>("add_reply", { path, id, body });
 
+/** Copies the prompt for the open fusen to the clipboard. Returns `false` if there are none. */
+export const copyPrompt = () => invoke<boolean>("copy_prompt");
+
 export const getSettings = () => invoke<Settings>("get_settings");
 
 export const defaultSettings = () => invoke<Settings>("default_settings");

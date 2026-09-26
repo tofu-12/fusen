@@ -254,7 +254,7 @@ The fusen are structured as follows:
   - scope="selection": The fusen refers to the text in <quote>.
   - scope="document": The fusen refers to the whole document. It has no <quote>.
 - <quote location="path:line">: The exact source text the fusen refers to, and where it is.
-- <body>: The text of the fusen.
+- <body>: The text of the fusen. A fusen with no text has no <body>; handle its quote according to its kind.
 - <reply author="...">: A reply to the fusen, in chronological order.
 
 Handle each fusen according to its kind:
@@ -319,7 +319,7 @@ When the prompt covers multiple documents, there is one `<document>` per documen
 | | `scope` | `selection` for a fusen on a range of text, or `document` for a fusen on the whole document. |
 | `<quote>` | | The source text the fusen is on. Only fusen with `scope="selection"` have it. |
 | | `location` | Where the quote is: `path:line`, or `path:start-end` if it spans multiple lines. |
-| `<body>` | | The text of the fusen. |
+| `<body>` | | The text of the fusen. Left out if the fusen has no text. |
 | `<reply>` | | A reply to the fusen. Replies follow `<body>`, oldest first. |
 | | `author` | Name of the person or agent who wrote the reply. |
 

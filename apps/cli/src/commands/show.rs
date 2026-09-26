@@ -20,9 +20,11 @@ pub fn run(file: &Path, id: &str) -> super::Result {
         println!("Quote:");
         print_indented(&anchor.quote);
     }
-    println!();
-    println!("Text:");
-    print_indented(&fusen.body);
+    if !fusen.body.is_empty() {
+        println!();
+        println!("Text:");
+        print_indented(&fusen.body);
+    }
     for reply in &fusen.replies {
         println!();
         println!("Reply from {} at {}:", reply.author, reply.created_at);

@@ -181,6 +181,9 @@ export function installMockBackend() {
           createdAt: localTimestamp(),
         });
         return null;
+      case "copy_prompt":
+        console.log("[mock] copy_prompt");
+        return true;
       case "get_settings":
         return structuredClone(settings);
       case "default_settings":

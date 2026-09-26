@@ -38,8 +38,6 @@ pub enum Error {
     Clipboard(String),
     #[error("reply message is empty")]
     EmptyReply,
-    #[error("fusen text is empty")]
-    EmptyBody,
     #[error("invalid fusen file: {path}: {message}")]
     InvalidFusenFile { path: PathBuf, message: String },
     #[error("invalid settings file: {path}: {message}")]

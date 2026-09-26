@@ -174,9 +174,6 @@ impl FusenFile {
             if !is_valid_kind_id(&fusen.kind) {
                 return Err(format!("invalid kind: {} (fusen {})", fusen.kind, fusen.id));
             }
-            if fusen.body.is_empty() {
-                return Err(format!("empty body (fusen {})", fusen.id));
-            }
             if fusen.anchor.as_ref().is_some_and(|a| a.quote.is_empty()) {
                 return Err(format!("empty quote (fusen {})", fusen.id));
             }

@@ -7,6 +7,7 @@ use fusen_core::config::{Config, Settings};
 use fusen_core::fusen::ops::{self, DocumentState, NewAnchor};
 use fusen_core::fusen::{Fusen, Status};
 use fusen_core::project::Project;
+use fusen_core::prompt::{self, Filter};
 use serde::Serialize;
 use tauri::{State, Webview};
 use ts_rs::TS;
@@ -170,6 +171,24 @@ pub fn add_reply(
         let author = Config::load_default()?.user_name();
         ops::add_reply(project, &doc(project, &path)?, &id, &author, &body).map(|_| ())
     })
+}
+
+/// Copies the prompt for the open fusen in the window's project to the
+/// clipboard, like `fusen prompt --copy`. Returns `false` if there are none.
+#[tauri::command]
+pub fn copy_prompt(state: State<AppState>, webview: Webview) -> Result<bool> {
+    let text = with_project(&state, &webview, |project, session| {
+        let config = Config::load_default()?;
+        let docs = prompt::collect(project, &session.target, Filter::default())?;
+        Ok(prompt::render(&docs, &config.kinds(), &config.language()))
+    })?;
+    let Some(text) = text else {
+        return Ok(false);
+    };
+    arboard::Clipboard::new()
+        .and_then(|mut c| c.set_text(text))
+        .map_err(|e| e.to_string())?;
+    Ok(true)
 }
 
 #[tauri::command]
