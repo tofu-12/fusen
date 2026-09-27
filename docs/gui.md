@@ -39,11 +39,11 @@ A button switches between two views.
 
 | View | Description |
 |---|---|
-| Preview | Renders GitHub Flavored Markdown (tables, task lists, code blocks, and so on). Mermaid code blocks are rendered as diagrams. YAML front matter (between `---` lines at the top of the file) is shown as a table, as on GitHub. Images in the project are shown too. |
+| Preview | Renders GitHub Flavored Markdown (tables, task lists, code blocks, and so on). Mermaid code blocks are rendered as diagrams. Math is rendered with KaTeX, written as on GitHub: `$...$` or $`...`$ inline, and `$$...$$` or a `math` code block for a block. YAML front matter (between `---` lines at the top of the file) is shown as a table, as on GitHub. Images in the project are shown too. |
 | Source | Shows the Markdown source as is, with line numbers. |
 
 - Ranges with a fusen are highlighted in the color of the fusen's kind (see [4](#4-settings)), like a sticky note on the page, and a fusen marker is shown beside the line. Colors are shown at 75% transparency. Click a highlight or marker to select its fusen. The selected fusen is highlighted in a darker color.
-- Fusen can be added in either view. For parts that cannot be selected in the preview, such as Mermaid diagrams, switch to the source view.
+- Fusen can be added in either view. A selection that includes part of a formula covers the whole formula, and the fusen quotes its TeX source. For parts that cannot be selected in the preview, such as Mermaid diagrams, switch to the source view.
 - When the file changes outside Fusen, the view updates automatically.
 - If no file is selected, the center of the window says "Select a file to open it."
 

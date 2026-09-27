@@ -4,11 +4,14 @@
 // (`data-s` / `data-e`). The innermost ones (`data-leaf`) wrap text: each text
 // node, and each code block. Within a leaf, rendered characters are aligned
 // with the source greedily, which skips Markdown syntax such as `\` escapes
-// and the `> ` of block quotes.
+// and the `> ` of block quotes. A rendered formula has nothing to align with
+// its TeX source, so it is one atomic leaf (`data-atom`): a selection in it
+// covers the whole formula.
 
 import type { Element, ElementContent, Root, RootContent } from "hast";
 
 import type { NewAnchor } from "../bindings/NewAnchor";
+import { MATH_CLASS } from "./math";
 
 export type SourceRange = { start: number; end: number };
 
@@ -37,7 +40,10 @@ function walk(node: Root | Element, source: string) {
         child.properties.dataS = start;
         child.properties.dataE = end;
       }
-      if (child.tagName === "pre") {
+      if (isMath(child)) {
+        child.properties.dataLeaf = "";
+        child.properties.dataAtom = "";
+      } else if (child.tagName === "pre") {
         markCodeBlock(child, source);
       } else {
         walk(child, source);
@@ -62,6 +68,11 @@ function walk(node: Root | Element, source: string) {
       };
     }
   }
+}
+
+function isMath(el: Element): boolean {
+  const c = el.properties.className;
+  return Array.isArray(c) && c.includes(MATH_CLASS);
 }
 
 /** Marks the `code` of a code block as one leaf, starting after the opening fence. */
@@ -229,6 +240,7 @@ function pointToSource(
     t = (leaf.textContent ?? "").length;
   }
   const { start, end } = dataRange(leaf);
+  if (leaf.dataset.atom != null) return { offset: edge === "start" ? start : end, leaf };
   const text = leaf.textContent ?? "";
   let result = textToSource(align(text, source.slice(start, end)), start, t, edge);
   // Keep the backslash of an escaped first character.
@@ -288,6 +300,13 @@ export function sourceToDomRanges(root: HTMLElement, source: string, target: Sou
   for (const leaf of leaves(root)) {
     const { start, end } = dataRange(leaf);
     if (end <= target.start || start >= target.end) continue;
+    if (leaf.dataset.atom != null) {
+      // Only the visible rendering, not KaTeX's hidden MathML.
+      const range = leaf.ownerDocument.createRange();
+      range.selectNodeContents(leaf.querySelector(".katex-html") ?? leaf);
+      ranges.push(range);
+      continue;
+    }
     const text = leaf.textContent ?? "";
     const map = align(text, source.slice(start, end));
     let first = -1;

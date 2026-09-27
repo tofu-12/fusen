@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import MainWindow from "./MainWindow";
+import "katex/dist/katex.min.css";
 import "./index.css";
 
 if (import.meta.env.DEV && !("__TAURI_INTERNALS__" in window)) {
