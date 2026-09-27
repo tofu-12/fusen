@@ -145,6 +145,7 @@ fusen/
 | Heading anchors | `rehype-slug`, using the same rules as GitHub |
 | Code block highlighting | `rehype-highlight` |
 | Mermaid diagrams | `mermaid` |
+| Math | `remark-math` + `rehype-katex`, with the GitHub syntax |
 | Source view | CodeMirror 6 (read-only) |
 
 ### 3.4 Development tools

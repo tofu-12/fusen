@@ -42,6 +42,18 @@ fn main() {
     println!("hello");
 }
 \`\`\`
+
+## Math
+
+Euler's identity $e^{i\\pi} + 1 = 0$ and $\`\\sqrt{x_1 + x_2}\`$ inline. It costs $5 and $10.
+
+$$
+\\sum_{k=1}^{n} k = \\frac{n(n+1)}{2}
+$$
+
+\`\`\`math
+\\int_0^\\infty e^{-x^2} \\, dx = \\frac{\\sqrt{\\pi}}{2}
+\`\`\`
 `;
 
 const fusen = (f: Partial<FusenState> & Pick<FusenState, "id" | "kind" | "body">): FusenState => ({

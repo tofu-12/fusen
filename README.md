@@ -70,7 +70,7 @@ fusen show docs/spec.md 01K5XQ3M
 
 ## Features
 
-- Rendered Markdown view with GitHub Flavored Markdown (tables, task lists, code blocks)
+- Rendered Markdown view with GitHub Flavored Markdown (tables, task lists, code blocks, math)
 - Fusen on any text selection, or on a whole document
 - Fusen kinds (`comment`, `question`, `suggestion`, or your own) with descriptions that tell the AI how to handle them
 - Open, outdated, and closed states: see which fusen were added before the document last changed
