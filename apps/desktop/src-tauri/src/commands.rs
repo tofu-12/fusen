@@ -102,10 +102,12 @@ pub fn add_fusen(
     anchor: Option<NewAnchor>,
 ) -> Result<Fusen> {
     with_project(&state, &webview, |project, _| {
+        let author = Config::load_default()?.user_name();
         ops::add_fusen(
             project,
             &doc(project, &path)?,
             Some(doc_hash),
+            &author,
             &kind,
             &body,
             anchor,

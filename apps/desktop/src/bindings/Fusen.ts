@@ -3,4 +3,4 @@ import type { Anchor } from "./Anchor";
 import type { Reply } from "./Reply";
 import type { Status } from "./Status";
 
-export type Fusen = { id: string, kind: string, status: Status, body: string, anchor: Anchor | null, docHash: string, createdAt: string, replies: Array<Reply>, };
+export type Fusen = { id: string, kind: string, status: Status, author: string | null, body: string, anchor: Anchor | null, docHash: string, createdAt: string, replies: Array<Reply>, };

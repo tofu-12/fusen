@@ -38,6 +38,18 @@ pub enum Error {
     Clipboard(String),
     #[error("reply message is empty")]
     EmptyReply,
+    #[error("no lines {lines} in {file}")]
+    NoSuchLines {
+        lines: String,
+        file: String,
+        count: usize,
+    },
+    #[error("lines {lines} in {file} are blank")]
+    BlankLines { lines: String, file: String },
+    #[error("quote is empty")]
+    EmptyQuote,
+    #[error("quote not found in lines {lines} of {file}")]
+    QuoteNotFound { lines: String, file: String },
     #[error("invalid fusen file: {path}: {message}")]
     InvalidFusenFile { path: PathBuf, message: String },
     #[error("invalid settings file: {path}: {message}")]
@@ -70,6 +82,16 @@ impl Error {
                 "install Fusen.app in /Applications, or set FUSEN_APP to its executable".into(),
             ),
             Error::AmbiguousId { matches, .. } => Some(format!("matches {}", matches.join(", "))),
+            Error::NoSuchKind(_) => Some("run fusen config kinds to see the kinds".into()),
+            Error::NoSuchLines { file, count, .. } => Some(format!("{file} has {count} lines")),
+            Error::BlankLines { .. } => Some(
+                "choose lines with text, or leave out --lines for a fusen on the whole document"
+                    .into(),
+            ),
+            Error::EmptyQuote | Error::QuoteNotFound { .. } => Some(
+                "copy the text exactly as it is in the file, or leave out --quote to quote the whole lines"
+                    .into(),
+            ),
             _ => None,
         }
     }

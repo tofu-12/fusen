@@ -58,6 +58,7 @@ $$
 
 const fusen = (f: Partial<FusenState> & Pick<FusenState, "id" | "kind" | "body">): FusenState => ({
   status: "open",
+  author: null,
   anchor: null,
   docHash: HASH,
   createdAt: "2026-09-24T17:03:00+09:00",
@@ -75,6 +76,7 @@ const docs: Record<string, DocumentState> = {
       fusen({
         id: "01K5XQ3M8ZJ4T7R2N9B6W1C0VE",
         kind: "comment",
+        author: "alice",
         body: "Mention that PKCE is required.",
         anchor: { quote: "authenticated with **OAuth 2.0**", lines: "5-5" },
         replies: [
@@ -89,6 +91,7 @@ const docs: Record<string, DocumentState> = {
       fusen({
         id: "01K5XQ7F1Y0S3H6D9K2M5P8R4T",
         kind: "question",
+        author: "claude-code",
         body: "How long are refresh tokens valid?\nShould mobile and web use different lifetimes?",
         anchor: {
           quote: "Access tokens are stored on the server side.\nRefresh tokens are rotated on every use.",
@@ -164,6 +167,7 @@ export function installMockBackend() {
         const f = fusen({
           id: newId(),
           kind: args.kind as string,
+          author: settings.userName,
           body: args.body as string,
           anchor: (args.anchor as FusenState["anchor"]) ?? null,
           createdAt: localTimestamp(),

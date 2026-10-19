@@ -4,4 +4,4 @@ import type { Reply } from "./Reply";
 import type { State } from "./State";
 import type { Status } from "./Status";
 
-export type FusenState = { state: State, id: string, kind: string, status: Status, body: string, anchor: Anchor | null, docHash: string, createdAt: string, replies: Array<Reply>, };
+export type FusenState = { state: State, id: string, kind: string, status: Status, author: string | null, body: string, anchor: Anchor | null, docHash: string, createdAt: string, replies: Array<Reply>, };

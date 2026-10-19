@@ -149,6 +149,7 @@ export default function FusenCard({
           </span>
         )}
         <span className="flex-1" />
+        {fusen.author && <span className="font-medium text-neutral-700 dark:text-neutral-300">{fusen.author}</span>}
         <span title={fusen.createdAt}>{formatTime(fusen.createdAt)}</span>
       </div>
 

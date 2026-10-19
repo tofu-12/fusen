@@ -43,8 +43,11 @@ impl Fusen {
             ("id".into(), Node::Str(self.id.clone())),
             ("kind".into(), Node::Str(self.kind.clone())),
             ("status".into(), Node::Str(self.status.as_str().into())),
-            ("body".into(), Node::Str(self.body.clone())),
         ];
+        if let Some(author) = &self.author {
+            m.push(("author".into(), Node::Str(author.clone())));
+        }
+        m.push(("body".into(), Node::Str(self.body.clone())));
         if let Some(anchor) = &self.anchor {
             let mut a = vec![
                 ("quote".into(), Node::Str(anchor.quote.clone())),

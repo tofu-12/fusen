@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
+use fusen_core::fusen::anchor::LineRange;
 
 /// Local Markdown review tool for AI-assisted writing.
 #[derive(Parser)]
@@ -39,6 +40,16 @@ fn window_name(name: &str) -> Result<String, String> {
     }
 }
 
+/// A line number (`5`) or a line range (`5-8`).
+fn line_range(s: &str) -> Result<LineRange, String> {
+    if s.contains('-') {
+        s.parse()
+    } else {
+        let line = s.parse().map_err(|_| format!("invalid line number: {s}"))?;
+        LineRange::new(line, line).ok_or_else(|| format!("invalid line number: {s}"))
+    }
+}
+
 #[derive(Subcommand)]
 enum Command {
     /// Show or change settings
@@ -61,6 +72,24 @@ enum Command {
         /// Include all fusen
         #[arg(long)]
         all: bool,
+    },
+    /// Add a fusen
+    Add {
+        file: PathBuf,
+        /// The text of the fusen, or "-" to read it from standard input
+        message: Option<String>,
+        /// Kind of the fusen
+        #[arg(short, long, value_name = "ID", default_value = "comment")]
+        kind: String,
+        /// Line or lines the fusen refers to, as 5 or 5-8 [default: the whole document]
+        #[arg(short, long, value_name = "RANGE", value_parser = line_range)]
+        lines: Option<LineRange>,
+        /// Text in the lines to quote [default: the whole lines]
+        #[arg(short, long, value_name = "TEXT", requires = "lines")]
+        quote: Option<String>,
+        /// Name to record as the author of the fusen [default: user.name]
+        #[arg(long)]
+        author: Option<String>,
     },
     /// Show a fusen and its replies
     Show { file: PathBuf, id: String },
@@ -121,6 +150,24 @@ fn main() -> ExitCode {
             }),
             _,
         ) => commands::list::run(&path, outdated || all, closed || all),
+        (
+            Some(Command::Add {
+                file,
+                message,
+                kind,
+                lines,
+                quote,
+                author,
+            }),
+            _,
+        ) => commands::add::run(
+            &file,
+            message.as_deref(),
+            &kind,
+            lines,
+            quote.as_deref(),
+            author.as_deref(),
+        ),
         (Some(Command::Show { file, id }), _) => commands::show::run(&file, &id),
         (Some(Command::Close { file, ids }), _) => commands::close::run(&file, &ids, false),
         (Some(Command::Reopen { file, ids }), _) => commands::close::run(&file, &ids, true),
