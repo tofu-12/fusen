@@ -94,12 +94,60 @@ pub fn state_counts(project: &Project, doc: &str) -> Result<(usize, usize)> {
     Ok((count(State::Open), count(State::Outdated)))
 }
 
+/// Makes the anchor of a new fusen on `lines` of a document whose text is
+/// `content`. Without `quote`, the anchor quotes the lines. With it, the quote
+/// must be in the lines, and the anchor is narrowed to the lines it spans.
+pub fn anchor_for_lines(
+    content: &str,
+    doc: &str,
+    lines: LineRange,
+    quote: Option<&str>,
+) -> Result<NewAnchor> {
+    let all: Vec<&str> = content.lines().collect();
+    if lines.end as usize > all.len() {
+        return Err(Error::NoSuchLines {
+            lines: lines.to_string(),
+            file: doc.to_string(),
+            count: all.len(),
+        });
+    }
+    let text = all[lines.start as usize - 1..lines.end as usize].join("\n");
+    let Some(quote) = quote else {
+        let quote = text.trim();
+        if quote.is_empty() {
+            return Err(Error::BlankLines {
+                lines: lines.to_string(),
+                file: doc.to_string(),
+            });
+        }
+        return Ok(NewAnchor {
+            quote: quote.to_string(),
+            lines,
+        });
+    };
+    let quote = quote.replace("\r\n", "\n");
+    if quote.is_empty() {
+        return Err(Error::EmptyQuote);
+    }
+    let pos = text.find(&quote).ok_or_else(|| Error::QuoteNotFound {
+        lines: lines.to_string(),
+        file: doc.to_string(),
+    })?;
+    let start = lines.start + text[..pos].matches('\n').count() as u32;
+    let end = start + quote.trim_end_matches('\n').matches('\n').count() as u32;
+    Ok(NewAnchor {
+        quote,
+        lines: LineRange::new(start, end).expect("the quote is in the lines"),
+    })
+}
+
 /// Adds a fusen. `doc_hash` is the hash of the document the anchor was taken
 /// from; it defaults to the current document.
 pub fn add_fusen(
     project: &Project,
     doc: &str,
     doc_hash_at_add: Option<String>,
+    author: &str,
     kind: &str,
     body: &str,
     anchor: Option<NewAnchor>,
@@ -125,6 +173,7 @@ pub fn add_fusen(
         id: new_id(),
         kind: kind.to_string(),
         status: Status::Open,
+        author: Some(author.to_string()),
         body: fusen_body(body),
         anchor,
         doc_hash: doc_hash_at_add,

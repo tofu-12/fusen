@@ -17,6 +17,7 @@
     - [2.5.3 Output format](#253-output-format)
   - [2.6 `fusen {close|reopen} <file> [<id>...]`](#26-fusen-closereopen-file-id)
   - [2.7 `fusen reply <file> <id> <message>`](#27-fusen-reply-file-id-message)
+  - [2.8 `fusen add <file> [<message>]`](#28-fusen-add-file-message)
 - [3. Errors](#3-errors)
 
 ## 1. Usage
@@ -35,7 +36,7 @@ Each fusen is in exactly one of three states:
 
 `open` and `closed` are stored in the fusen file as its `status`. `outdated` is not stored; it is determined by comparing the fusen's `docHash` with the hash of the current document.
 
-Fusen are added and edited in the Fusen window. The `fusen` command shows fusen, closes and reopens them, and adds replies.
+Fusen are added and edited in the Fusen window. The `fusen` command adds fusen, shows them, closes and reopens them, and adds replies.
 
 ```sh
 # Show help or version
@@ -67,6 +68,9 @@ fusen reopen <file> [<id>...]
 
 # Reply to a fusen
 fusen reply <file> <id> <message>
+
+# Add a fusen
+fusen add <file> [<message>] [--lines <range>] [--quote <text>] [--kind <id>]
 ```
 
 ## 2. Commands
@@ -111,7 +115,7 @@ fusen config kinds.typo.label Typo
 
 | Key | Description | Default |
 |---|---|---|
-| `user.name` | Your name, recorded as the author of your replies. | `user` |
+| `user.name` | Your name, recorded as the author of your fusen and replies. | `user` |
 | `prompt.language` | The language the AI replies in. Used for `{language}` in `fusen prompt`. | `English` |
 | `appearance.theme` | Appearance of the Fusen window: `light` or `dark`. | `light` |
 | `kinds.<id>.label` | Display name of the fusen kind. | `<id>` with its first letter capitalized (`Typo` for `typo`) |
@@ -173,6 +177,7 @@ fusen 01K5XQ3M8ZJ4T7R2N9B6W1C0VE
 Kind:     comment
 State:    open
 Location: docs/spec.md:5
+Author:   alice
 Created:  2026-09-24T17:03:00+09:00
 
 Quote:
@@ -192,6 +197,7 @@ Reply from alice at 2026-09-24T18:20:00+09:00:
 - `<id>` can be shortened to any prefix that matches only one fusen on the document.
 - `State` is `open`, `outdated`, or `closed` (see [Usage](#1-usage)).
 - For a fusen on the whole document, `Location` is the document path only, and `Quote` is not shown.
+- `Author` is not shown for fusen with no recorded author.
 
 ### 2.5 `fusen prompt <path>`
 
@@ -247,7 +253,7 @@ These are fusen (review comments) left on documents with Fusen. Address each fus
 <instructions>
 The fusen are structured as follows:
 - <document path="...">: The fusen on one document.
-- <fusen id="..." kind="..." status="..." scope="...">: One fusen.
+- <fusen id="..." kind="..." status="..." scope="..." author="...">: One fusen. author is the person or agent who added it, and is left out if unknown.
   - status="open": The fusen has not been addressed yet.
   - status="outdated": The fusen has not been addressed yet, but the document has changed since the fusen was added. The quoted text may have moved or changed.
   - status="closed": The fusen has already been addressed. Use it as context; you do not need to act on it.
@@ -270,18 +276,18 @@ When you are done, reply in the following format, one section per fusen:
 </instructions>
 
 <document path="docs/spec.md">
-<fusen id="01K5XQD2F6H9K3N7Q1S5V8X2Z4" kind="question" status="open" scope="document">
+<fusen id="01K5XQD2F6H9K3N7Q1S5V8X2Z4" kind="question" status="open" scope="document" author="alice">
 <body>Should this document also cover token revocation?</body>
 </fusen>
 
-<fusen id="01K5XQ3M8ZJ4T7R2N9B6W1C0VE" kind="comment" status="open" scope="selection">
+<fusen id="01K5XQ3M8ZJ4T7R2N9B6W1C0VE" kind="comment" status="open" scope="selection" author="alice">
 <quote location="docs/spec.md:5">authenticated with **OAuth 2.0**</quote>
 <body>Mention that PKCE is required.</body>
 <reply author="claude-code">Added "PKCE is required for all clients." after line 5.</reply>
 <reply author="alice">Thanks. Please also mention the S256 method.</reply>
 </fusen>
 
-<fusen id="01K5XQ7F1Y0S3H6D9K2M5P8R4T" kind="question" status="open" scope="selection">
+<fusen id="01K5XQ7F1Y0S3H6D9K2M5P8R4T" kind="question" status="open" scope="selection" author="alice">
 <quote location="docs/spec.md:7-8">
 Access tokens are stored on the server side.
 Refresh tokens are rotated on every use.
@@ -317,6 +323,7 @@ When the prompt covers multiple documents, there is one `<document>` per documen
 | | `kind` | Kind of the fusen. |
 | | `status` | `open`, `outdated`, or `closed` (see [Usage](#1-usage)). |
 | | `scope` | `selection` for a fusen on a range of text, or `document` for a fusen on the whole document. |
+| | `author` | Name of the person or agent who added the fusen. Left out if the fusen has no recorded author. |
 | `<quote>` | | The source text the fusen is on. Only fusen with `scope="selection"` have it. |
 | | `location` | Where the quote is: `path:line`, or `path:start-end` if it spans multiple lines. |
 | `<body>` | | The text of the fusen. Left out if the fusen has no text. |
@@ -381,6 +388,38 @@ EOF
 |---|---|
 | `--author <name>` | Name to record as the author of the reply. Defaults to `user.name` (see [2.2](#22-fusen-config-key-value)). |
 
+### 2.8 `fusen add <file> [<message>]`
+
+Adds a fusen to a document. If the Fusen window is open, it updates immediately.
+
+```sh
+fusen add docs/spec.md "Mention that PKCE is required." --lines 5
+```
+
+```
+$ fusen add docs/spec.md "Mention that PKCE is required." --lines 5 --quote "authenticated with **OAuth 2.0**"
+added 01K5XQ3M8ZJ4T7R2N9B6W1C0VE (docs/spec.md:5)
+```
+
+- `<file>` is the Markdown file (`.md`) to add the fusen to.
+- `<message>` is the text of the fusen. Without it, the fusen has no text and only marks the passage. If `<message>` is `-`, the text is read from standard input, as in `fusen reply`.
+- Without `--lines`, the fusen is on the whole document.
+- With `--lines` only, the fusen quotes the whole lines, without leading and trailing whitespace. With `--quote`, the quote must be in the lines, exactly as it is in the file; the fusen is then on the lines the quote spans, which may be fewer than the lines given. If the quote appears more than once in the lines, the first one is used.
+
+| Option | Description |
+|---|---|
+| `-l`, `--lines <range>` | Line or lines the fusen refers to, as `5` or `5-8` (1-based, inclusive). |
+| `-q`, `--quote <text>` | Text in the lines to quote. Requires `--lines`. Defaults to the whole lines. |
+| `-k`, `--kind <id>` | Kind of the fusen (see [2.2.3](#223-fusen-kinds)). Defaults to `comment`. |
+| `--author <name>` | Name to record as the author of the fusen. Defaults to `user.name` (see [2.2](#22-fusen-config-key-value)). |
+
+```sh
+fusen add docs/spec.md --lines 7-8 --kind question - <<'EOF'
+How long are refresh tokens valid?
+Should mobile and web use different lifetimes?
+EOF
+```
+
 ## 3. Errors
 
 When an error occurs, `fusen` prints a message and exits. The Fusen window does not open. Some messages are followed by a `hint:` line.
@@ -389,17 +428,21 @@ When an error occurs, `fusen` prints a message and exits. The Fusen window does 
 |---|---|
 | `no such file or directory: <path>` | The path does not exist. Check the spelling and the directory `fusen` is run from. |
 | `not a Markdown file or directory: <path>` | `fusen` works only with Markdown files (`.md`) and directories. |
-| `not a Markdown file: <path>` | `fusen show`, `fusen close`, `fusen reopen`, or `fusen reply` was given a directory. These commands work only with Markdown files. |
+| `not a Markdown file: <path>` | `fusen show`, `fusen close`, `fusen reopen`, `fusen reply`, or `fusen add` was given a directory. These commands work only with Markdown files. |
 | `path is outside the project root: <path>`<br>`hint: run fusen from a directory that contains this path` | The project root is the directory `fusen` is run from. Files outside it cannot be used. |
 | `Fusen.app not found`<br>`hint: install Fusen.app in /Applications, or set FUSEN_APP to its executable` | `fusen <path>` could not find Fusen.app in `/Applications` or `~/Applications`. |
 | `unknown key: <key>`<br>`hint: available keys are user.name, prompt.language, appearance.theme, kinds.<id>.label, kinds.<id>.description, kinds.<id>.color` | Only the keys listed in [Keys](#221-keys) can be set. |
-| `no such kind: <id>` | `fusen config kinds.<id>` was given a kind that is not defined. |
+| `no such kind: <id>`<br>`hint: run fusen config kinds to see the kinds` | `fusen config kinds.<id>` or `fusen add --kind` was given a kind that is not defined. |
 | `invalid kind id: <id>`<br>`hint: use lowercase letters, digits, "-" and "_" (up to 32 characters)` | Kind IDs can contain only lowercase letters, digits, `-`, and `_`, up to 32 characters. |
 | `invalid theme: <value>`<br>`hint: use light or dark` | `appearance.theme` must be `light` or `dark`. |
 | `invalid color: <value>`<br>`hint: use the #rrggbb format, for example #87ceeb` | Colors must be `#` followed by six hexadecimal digits. |
 | `no fusen with id: <id> in <file>` | No fusen on the document has an ID starting with the given value. |
 | `ambiguous id: <id> in <file>`<br>`hint: matches <id>, <id>` | The shortened ID matches more than one fusen on the document. Use a longer prefix. |
 | `reply message is empty` | `fusen reply` was given an empty message. |
+| `no lines <range> in <file>`<br>`hint: <file> has <n> lines` | `fusen add --lines` was given lines past the end of the document. |
+| `lines <range> in <file> are blank`<br>`hint: choose lines with text, or leave out --lines for a fusen on the whole document` | `fusen add --lines` was given only blank lines, so there is nothing to quote. |
+| `quote not found in lines <range> of <file>`<br>`hint: copy the text exactly as it is in the file, or leave out --quote to quote the whole lines` | The text given to `fusen add --quote` is not in the lines. |
+| `quote is empty`<br>`hint: copy the text exactly as it is in the file, or leave out --quote to quote the whole lines` | `fusen add --quote` was given an empty text. |
 | `could not copy to the clipboard: <reason>` | `fusen prompt --copy` could not access the clipboard. |
 | `invalid fusen file: <path>: <reason>` | A fusen file in `.fusen/` does not follow [Fusen Review Format v1](fusen-format/v1.md), for example after it was edited by hand. Fix or delete the file. |
 | `invalid settings file: <path>: <reason>` | The settings file is not valid JSON. |

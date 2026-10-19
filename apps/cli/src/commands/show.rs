@@ -14,6 +14,9 @@ pub fn run(file: &Path, id: &str) -> super::Result {
     println!("Kind:     {}", fusen.kind);
     println!("State:    {}", state.as_str());
     println!("Location: {}", location(&doc, fusen.lines()));
+    if let Some(author) = &fusen.author {
+        println!("Author:   {author}");
+    }
     println!("Created:  {}", fusen.created_at);
     if let Some(anchor) = &fusen.anchor {
         println!();

@@ -68,6 +68,12 @@ fusen list .
 fusen show docs/spec.md 01K5XQ3M
 ```
 
+Fusen can also be added from the terminal, which lets an AI agent leave review comments for you:
+
+```sh
+fusen add docs/spec.md "Mention that PKCE is required." --lines 5
+```
+
 ## Features
 
 - Rendered Markdown view with GitHub Flavored Markdown (tables, task lists, code blocks, math)
@@ -95,7 +101,7 @@ your-project/
 
 ```xml
 <document path="docs/spec.md">
-<fusen id="01K5XQ3M8ZJ4T7R2N9B6W1C0VE" kind="comment" status="open" scope="selection">
+<fusen id="01K5XQ3M8ZJ4T7R2N9B6W1C0VE" kind="comment" status="open" scope="selection" author="alice">
 <quote location="docs/spec.md:5">authenticated with **OAuth 2.0**</quote>
 <body>Mention that PKCE is required.</body>
 </fusen>

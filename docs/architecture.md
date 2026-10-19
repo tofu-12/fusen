@@ -57,7 +57,7 @@ fusen/
 │   ├── cli/                    # The fusen command
 │   │   └── src/
 │   │       ├── main.rs
-│   │       └── commands/       # open, config, list, show, prompt, close (also reopen), reply
+│   │       └── commands/       # open, config, list, show, prompt, close (also reopen), reply, add
 │   └── desktop/                # Fusen.app
 │       ├── package.json
 │       ├── vite.config.ts

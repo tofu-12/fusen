@@ -42,6 +42,8 @@ pub struct Fusen {
     pub id: String,
     pub kind: String,
     pub status: Status,
+    #[serde(default)]
+    pub author: Option<String>,
     pub body: String,
     #[serde(default)]
     pub anchor: Option<Anchor>,

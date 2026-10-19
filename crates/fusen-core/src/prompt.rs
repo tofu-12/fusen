@@ -69,7 +69,7 @@ const INTRO: &str = "These are fusen (review comments) left on documents with Fu
 
 const TAGS: &str = r#"The fusen are structured as follows:
 - <document path="...">: The fusen on one document.
-- <fusen id="..." kind="..." status="..." scope="...">: One fusen.
+- <fusen id="..." kind="..." status="..." scope="..." author="...">: One fusen. author is the person or agent who added it, and is left out if unknown.
   - status="open": The fusen has not been addressed yet.
   - status="outdated": The fusen has not been addressed yet, but the document has changed since the fusen was added. The quoted text may have moved or changed.
   - status="closed": The fusen has already been addressed. Use it as context; you do not need to act on it.
@@ -144,8 +144,12 @@ fn render_fusen(out: &mut String, path: &str, fusen: &Fusen, state: State) {
     } else {
         "document"
     };
+    let author = match &fusen.author {
+        Some(a) => format!(" author=\"{a}\""),
+        None => String::new(),
+    };
     out.push_str(&format!(
-        "<fusen id=\"{}\" kind=\"{}\" status=\"{}\" scope=\"{scope}\">\n",
+        "<fusen id=\"{}\" kind=\"{}\" status=\"{}\" scope=\"{scope}\"{author}>\n",
         fusen.id,
         fusen.kind,
         state.as_str()

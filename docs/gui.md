@@ -69,6 +69,7 @@ To add a fusen on the whole document, click "Add fusen to document" at the top r
 
 - A selection can span multiple paragraphs and code blocks.
 - A fusen records the source text of the selection and its line numbers (see [Fusen Review Format v1](fusen-format/v1.md#23-anchor)).
+- A fusen is recorded with the name in the settings as its author (see [4](#4-settings)). AI agents can add fusen with `fusen add` (see the [command reference](cli.md#28-fusen-add-file-message)).
 - While a new fusen is being written or a fusen is being edited, other fusen cannot be added or edited. Save or cancel it first.
 
 ### 3.2 Fusen list
@@ -82,7 +83,7 @@ The right side of the window lists the fusen on the current document. Each fusen
 | Closed | Addressed, whether or not the document has changed. |
 
 - Fusen on the whole document come first, followed by the rest in document order.
-- Each fusen shows its kind, text, and replies.
+- Each fusen shows its kind, author, text, and replies. Fusen with no recorded author show no name.
 - Click a fusen to scroll the document to it.
 - The tabs at the top of the list switch between Open, Outdated, and Closed, and show the number of fusen in each.
 - Selecting a fusen in the document switches the list to the tab of that fusen.
@@ -160,7 +161,7 @@ Adding and changing fusen and replies is saved automatically. There is no save b
 - `.fusen/` is created when the first fusen is added.
 - When all fusen on a document are deleted, its fusen file is deleted too.
 - Markdown files are never modified.
-- When a fusen file changes outside the window (by `fusen close`, `fusen reply`, git, and so on), the view updates automatically.
+- When a fusen file changes outside the window (by `fusen add`, `fusen close`, `fusen reply`, git, and so on), the view updates automatically.
 
 ## 6. Window
 
