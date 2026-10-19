@@ -120,6 +120,9 @@ Settings are stored in `~/.config/fusen/settings.json` (or `$XDG_CONFIG_HOME/fus
 # Reply language for the AI
 fusen config prompt.language Japanese
 
+# Have the AI answer each fusen with fusen reply, instead of in the chat
+fusen config prompt.response reply
+
 # Add your own fusen kind
 fusen config kinds.typo.label Typo
 fusen config kinds.typo.description "A typo or grammatical error. Fix it."

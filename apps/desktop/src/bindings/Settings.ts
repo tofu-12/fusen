@@ -6,6 +6,10 @@ import type { Kind } from "./Kind";
  */
 export type Settings = { userName: string, language: string, 
 /**
+ * `chat` or `reply`.
+ */
+response: string, 
+/**
  * `light` or `dark`.
  */
 theme: string, kinds: Array<Kind>, };

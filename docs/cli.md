@@ -117,6 +117,7 @@ fusen config kinds.typo.label Typo
 |---|---|---|
 | `user.name` | Your name, recorded as the author of your fusen and replies. | `user` |
 | `prompt.language` | The language the AI replies in. Used for `{language}` in `fusen prompt`. | `English` |
+| `prompt.response` | How the AI responds to each fusen in `fusen prompt`: `chat` (in its reply in the chat) or `reply` (as a reply to the fusen, with `fusen reply`). See [2.5.3](#253-output-format). | `chat` |
 | `appearance.theme` | Appearance of the Fusen window: `light` or `dark`. | `light` |
 | `kinds.<id>.label` | Display name of the fusen kind. | `<id>` with its first letter capitalized (`Typo` for `typo`) |
 | `kinds.<id>.description` | Description of the fusen kind. | None |
@@ -229,6 +230,7 @@ If no fusen match, nothing is written and a message is shown instead.
 | `--outdated` | Also includes `outdated` fusen. |
 | `--closed` | Also includes `closed` fusen. |
 | `--all` | Includes all fusen. Same as `--outdated --closed`. |
+| `--response <chat\|reply>` | How the AI responds to each fusen, instead of `prompt.response` (see [2.2](#22-fusen-config-key-value) and [2.5.3](#253-output-format)). |
 
 ```sh
 fusen prompt . --copy
@@ -339,6 +341,23 @@ The parts in `{...}` in `<instructions>` are filled in as follows.
 | `{kind}: {description}` | One line per kind of fusen in the prompt, using `kinds.<id>.description` (see [2.2](#22-fusen-config-key-value)), in the order of `kinds` in the settings. Kinds without a description are written as `{kind}` only. Kinds used by fusen but not defined in the settings, such as a kind that has since been removed, come last as `{kind}` only, in the order they first appear. |
 | `{language}` | The value of `prompt.language` (see [2.2](#22-fusen-config-key-value)). Defaults to `English`. |
 
+The example above is for `prompt.response` set to `chat`, the default: the AI answers each fusen in its reply in the chat. With `reply` (or `--response reply`), the AI answers each fusen with `fusen reply` instead, so the answers are saved as replies to the fusen. The AI needs to be able to run the `fusen` command. The end of `<instructions>` is then as follows; the rest of the prompt is the same.
+
+```
+Write your replies in {language}. When editing documents, keep each document's own language.
+
+Reply once to each fusen that is not closed, with the fusen command run from the project root:
+
+fusen reply <path> <id> --author <name> - <<'EOF'
+<your answer, and what you changed in the document>
+EOF
+
+- <path> is the path of the document, and <id> is the id of the fusen.
+- <name> is your model ID, such as claude-opus-5-5. If you do not know it, use the name of the agent harness you are running in, in lowercase with hyphens, such as claude-code or codex.
+- Do not close the fusen. The user closes them after reading your replies.
+</instructions>
+```
+
 ### 2.6 `fusen {close|reopen} <file> [<id>...]`
 
 `fusen close` marks fusen on a document as `closed`, and `fusen reopen` marks them as `open` again. If the Fusen window is open, it updates immediately.
@@ -431,10 +450,11 @@ When an error occurs, `fusen` prints a message and exits. The Fusen window does 
 | `not a Markdown file: <path>` | `fusen show`, `fusen close`, `fusen reopen`, `fusen reply`, or `fusen add` was given a directory. These commands work only with Markdown files. |
 | `path is outside the project root: <path>`<br>`hint: run fusen from a directory that contains this path` | The project root is the directory `fusen` is run from. Files outside it cannot be used. |
 | `Fusen.app not found`<br>`hint: install Fusen.app in /Applications, or set FUSEN_APP to its executable` | `fusen <path>` could not find Fusen.app in `/Applications` or `~/Applications`. |
-| `unknown key: <key>`<br>`hint: available keys are user.name, prompt.language, appearance.theme, kinds.<id>.label, kinds.<id>.description, kinds.<id>.color` | Only the keys listed in [Keys](#221-keys) can be set. |
+| `unknown key: <key>`<br>`hint: available keys are user.name, prompt.language, prompt.response, appearance.theme, kinds.<id>.label, kinds.<id>.description, kinds.<id>.color` | Only the keys listed in [Keys](#221-keys) can be set. |
 | `no such kind: <id>`<br>`hint: run fusen config kinds to see the kinds` | `fusen config kinds.<id>` or `fusen add --kind` was given a kind that is not defined. |
 | `invalid kind id: <id>`<br>`hint: use lowercase letters, digits, "-" and "_" (up to 32 characters)` | Kind IDs can contain only lowercase letters, digits, `-`, and `_`, up to 32 characters. |
 | `invalid theme: <value>`<br>`hint: use light or dark` | `appearance.theme` must be `light` or `dark`. |
+| `invalid response: <value>`<br>`hint: use chat or reply` | `prompt.response` must be `chat` or `reply`. |
 | `invalid color: <value>`<br>`hint: use the #rrggbb format, for example #87ceeb` | Colors must be `#` followed by six hexadecimal digits. |
 | `no fusen with id: <id> in <file>` | No fusen on the document has an ID starting with the given value. |
 | `ambiguous id: <id> in <file>`<br>`hint: matches <id>, <id>` | The shortened ID matches more than one fusen on the document. Use a longer prefix. |

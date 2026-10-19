@@ -24,6 +24,8 @@ pub enum Error {
     InvalidColor(String),
     #[error("invalid theme: {0}")]
     InvalidTheme(String),
+    #[error("invalid response: {0}")]
+    InvalidResponse(String),
     #[error("no fusen with id: {id} in {file}")]
     NoFusenWithId { id: String, file: String },
     #[error("ambiguous id: {id} in {file}")]
@@ -70,13 +72,14 @@ impl Error {
                 Some("run fusen from a directory that contains this path".into())
             }
             Error::UnknownKey(_) => Some(
-                "available keys are user.name, prompt.language, appearance.theme, kinds.<id>.label, kinds.<id>.description, kinds.<id>.color"
+                "available keys are user.name, prompt.language, prompt.response, appearance.theme, kinds.<id>.label, kinds.<id>.description, kinds.<id>.color"
                     .into(),
             ),
             Error::InvalidKindId(_) => Some(
                 r#"use lowercase letters, digits, "-" and "_" (up to 32 characters)"#.into(),
             ),
             Error::InvalidTheme(_) => Some("use light or dark".into()),
+            Error::InvalidResponse(_) => Some("use chat or reply".into()),
             Error::InvalidColor(_) => Some("use the #rrggbb format, for example #87ceeb".into()),
             Error::AppNotFound => Some(
                 "install Fusen.app in /Applications, or set FUSEN_APP to its executable".into(),

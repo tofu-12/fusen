@@ -4,14 +4,21 @@ use std::process::ExitCode;
 use fusen_core::Error;
 use fusen_core::config::Config;
 use fusen_core::project::Project;
-use fusen_core::prompt::{self, Filter};
+use fusen_core::prompt::{self, Filter, Response};
 
-pub fn run(path: &Path, copy: bool, outdated: bool, closed: bool) -> super::Result {
+pub fn run(
+    path: &Path,
+    copy: bool,
+    outdated: bool,
+    closed: bool,
+    response: Option<String>,
+) -> super::Result {
     let project = Project::current()?;
     let target = project.resolve(path)?;
     let config = Config::load_default()?;
     let docs = prompt::collect(&project, &target, Filter { outdated, closed })?;
-    let Some(text) = prompt::render(&docs, &config.kinds(), &config.language()) else {
+    let response = Response::from_setting(&response.unwrap_or_else(|| config.response()));
+    let Some(text) = prompt::render(&docs, &config.kinds(), &config.language(), response) else {
         eprintln!("No fusen to include in the prompt.");
         return Ok(ExitCode::SUCCESS);
     };

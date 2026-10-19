@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FusenState } from "../../bindings/FusenState";
 import type { Kind } from "../../bindings/Kind";
 import * as api from "../../lib/commands";
-import { formatTime, lineLabel } from "../../lib/fusen";
+import { formatTime } from "../../lib/fusen";
 import { kindOf, tint } from "../../lib/kinds";
 import ConfirmDialog from "../ConfirmDialog";
 
@@ -139,7 +139,6 @@ export default function FusenCard({
         >
           {kind.label}
         </span>
-        <span>{fusen.anchor ? lineLabel(fusen.anchor.lines) : "Document"}</span>
         {fusen.state === "outdated" && (
           <span
             className="rounded bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 text-amber-800 dark:text-amber-200"
@@ -149,8 +148,12 @@ export default function FusenCard({
           </span>
         )}
         <span className="flex-1" />
-        {fusen.author && <span className="font-medium text-neutral-700 dark:text-neutral-300">{fusen.author}</span>}
-        <span title={fusen.createdAt}>{formatTime(fusen.createdAt)}</span>
+        {fusen.author && (
+          <span className="min-w-0 truncate font-medium text-neutral-700 dark:text-neutral-300" title={fusen.author}>
+            {fusen.author}
+          </span>
+        )}
+        <span className="flex-none" title={fusen.createdAt}>{formatTime(fusen.createdAt)}</span>
       </div>
 
       {fusen.anchor && <Quote text={fusen.anchor.quote} />}

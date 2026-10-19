@@ -28,6 +28,27 @@ impl Filter {
     }
 }
 
+/// How the AI responds to each fusen (`prompt.response` in the settings).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Response {
+    /// In its reply in the chat, one section per fusen.
+    #[default]
+    Chat,
+    /// As a reply on the fusen, with `fusen reply`.
+    Reply,
+}
+
+impl Response {
+    /// The response for a value of `prompt.response`: `chat` or `reply`.
+    pub fn from_setting(value: &str) -> Self {
+        if value == "reply" {
+            Response::Reply
+        } else {
+            Response::Chat
+        }
+    }
+}
+
 /// The fusen of one document selected for a prompt.
 #[derive(Debug, Clone)]
 pub struct PromptDocument {
@@ -79,15 +100,29 @@ const TAGS: &str = r#"The fusen are structured as follows:
 - <body>: The text of the fusen. A fusen with no text has no <body>; handle its quote according to its kind.
 - <reply author="...">: A reply to the fusen, in chronological order."#;
 
-const REPLY_FORMAT: &str =
-    "When you are done, reply in the following format, one section per fusen:
+const CHAT_FORMAT: &str = "When you are done, reply in the following format, one section per fusen:
 
 ## <id>
 **fusen:** <the text of the fusen>
 **Response:** <your answer, and what you changed in the document>";
 
+const FUSEN_REPLY: &str = "Reply once to each fusen that is not closed, with the fusen command run from the project root:
+
+fusen reply <path> <id> --author <name> - <<'EOF'
+<your answer, and what you changed in the document>
+EOF
+
+- <path> is the path of the document, and <id> is the id of the fusen.
+- <name> is your model ID, such as claude-opus-5-5. If you do not know it, use the name of the agent harness you are running in, in lowercase with hyphens, such as claude-code or codex.
+- Do not close the fusen. The user closes them after reading your replies.";
+
 /// Renders the prompt. Returns `None` if there are no fusen.
-pub fn render(docs: &[PromptDocument], kinds: &[Kind], language: &str) -> Option<String> {
+pub fn render(
+    docs: &[PromptDocument],
+    kinds: &[Kind],
+    language: &str,
+    response: Response,
+) -> Option<String> {
     if docs.is_empty() {
         return None;
     }
@@ -99,10 +134,14 @@ pub fn render(docs: &[PromptDocument], kinds: &[Kind], language: &str) -> Option
     for line in kind_lines(docs, kinds) {
         out.push_str(&format!("- {line}\n"));
     }
+    let (replies, format) = match response {
+        Response::Chat => ("your reply", CHAT_FORMAT),
+        Response::Reply => ("your replies", FUSEN_REPLY),
+    };
     out.push_str(&format!(
-        "\nWrite your reply in {language}. When editing documents, keep each document's own language.\n\n"
+        "\nWrite {replies} in {language}. When editing documents, keep each document's own language.\n\n"
     ));
-    out.push_str(REPLY_FORMAT);
+    out.push_str(format);
     out.push_str("\n</instructions>\n");
 
     for doc in docs {

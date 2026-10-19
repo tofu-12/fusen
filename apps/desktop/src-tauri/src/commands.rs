@@ -7,7 +7,7 @@ use fusen_core::config::{Config, Settings};
 use fusen_core::fusen::ops::{self, DocumentState, NewAnchor};
 use fusen_core::fusen::{Fusen, Status};
 use fusen_core::project::Project;
-use fusen_core::prompt::{self, Filter};
+use fusen_core::prompt::{self, Filter, Response};
 use serde::Serialize;
 use tauri::{State, Webview};
 use ts_rs::TS;
@@ -182,7 +182,13 @@ pub fn copy_prompt(state: State<AppState>, webview: Webview) -> Result<bool> {
     let text = with_project(&state, &webview, |project, session| {
         let config = Config::load_default()?;
         let docs = prompt::collect(project, &session.target, Filter::default())?;
-        Ok(prompt::render(&docs, &config.kinds(), &config.language()))
+        let response = Response::from_setting(&config.response());
+        Ok(prompt::render(
+            &docs,
+            &config.kinds(),
+            &config.language(),
+            response,
+        ))
     })?;
     let Some(text) = text else {
         return Ok(false);

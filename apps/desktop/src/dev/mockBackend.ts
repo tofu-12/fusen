@@ -116,6 +116,7 @@ const docs: Record<string, DocumentState> = {
 let settings: Settings = {
   userName: "user",
   language: "English",
+  response: "chat",
   theme: "light",
   kinds: [
     { id: "comment", label: "Comment", description: "Feedback on the document.", color: "#87ceeb" },
@@ -206,6 +207,7 @@ export function installMockBackend() {
         return {
           userName: "user",
           language: "English",
+          response: "chat",
           theme: "light",
           kinds: [
             { id: "comment", label: "Comment", description: "Feedback on the document.", color: "#87ceeb" },

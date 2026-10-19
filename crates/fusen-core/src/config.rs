@@ -17,6 +17,7 @@ pub const DEFAULT_USER_NAME: &str = "user";
 pub const DEFAULT_LANGUAGE: &str = "English";
 pub const DEFAULT_COLOR: &str = "#87ceeb";
 pub const THEMES: [&str; 2] = ["light", "dark"];
+pub const RESPONSES: [&str; 2] = ["chat", "reply"];
 
 const BUILTIN_KINDS: [(&str, &str, &str); 3] = [
     (
@@ -55,6 +56,8 @@ pub struct Kind {
 pub struct Settings {
     pub user_name: String,
     pub language: String,
+    /// `chat` or `reply`.
+    pub response: String,
     /// `light` or `dark`.
     pub theme: String,
     pub kinds: Vec<Kind>,
@@ -97,6 +100,7 @@ pub fn is_valid_color(color: &str) -> bool {
 enum Key<'a> {
     UserName,
     Language,
+    Response,
     Theme,
     Kinds,
     Kind(&'a str),
@@ -109,6 +113,7 @@ impl<'a> Key<'a> {
         let key = match parts.as_slice() {
             ["user", "name"] => Key::UserName,
             ["prompt", "language"] => Key::Language,
+            ["prompt", "response"] => Key::Response,
             ["appearance", "theme"] => Key::Theme,
             ["kinds"] => Key::Kinds,
             ["kinds", id] => Key::Kind(id),
@@ -221,6 +226,13 @@ impl Config {
             .to_string()
     }
 
+    pub fn response(&self) -> String {
+        self.string_at("prompt", "response")
+            .filter(|r| RESPONSES.contains(r))
+            .unwrap_or(RESPONSES[0])
+            .to_string()
+    }
+
     /// The kinds in use, in order. The built-in kinds if there are none.
     pub fn kinds(&self) -> Vec<Kind> {
         let kinds: Vec<Kind> = self
@@ -246,6 +258,7 @@ impl Config {
         Settings {
             user_name: self.user_name(),
             language: self.language(),
+            response: self.response(),
             theme: self.theme(),
             kinds: self.kinds(),
         }
@@ -263,7 +276,7 @@ impl Config {
         let Some(key) = key else {
             return Ok(json!({
                 "user": { "name": self.user_name() },
-                "prompt": { "language": self.language() },
+                "prompt": { "language": self.language(), "response": self.response() },
                 "appearance": { "theme": self.theme() },
                 "kinds": kinds_json(),
             }));
@@ -277,6 +290,7 @@ impl Config {
         Ok(match Key::parse(key)? {
             Key::UserName => json!(self.user_name()),
             Key::Language => json!(self.language()),
+            Key::Response => json!(self.response()),
             Key::Theme => json!(self.theme()),
             Key::Kinds => kinds_json(),
             Key::Kind(id) => kind_json(&find_kind(id)?),
@@ -292,6 +306,12 @@ impl Config {
         match Key::parse(key)? {
             Key::UserName => set_in(&mut self.map, "user", "name", value),
             Key::Language => set_in(&mut self.map, "prompt", "language", value),
+            Key::Response => {
+                if !RESPONSES.contains(&value) {
+                    return Err(Error::InvalidResponse(value.to_string()));
+                }
+                set_in(&mut self.map, "prompt", "response", value);
+            }
             Key::Theme => {
                 if !THEMES.contains(&value) {
                     return Err(Error::InvalidTheme(value.to_string()));
@@ -323,6 +343,7 @@ impl Config {
         match Key::parse(key)? {
             Key::UserName => unset_in(&mut self.map, "user", "name"),
             Key::Language => unset_in(&mut self.map, "prompt", "language"),
+            Key::Response => unset_in(&mut self.map, "prompt", "response"),
             Key::Theme => unset_in(&mut self.map, "appearance", "theme"),
             Key::Kinds => {
                 self.map.shift_remove("kinds");
@@ -357,6 +378,10 @@ impl Config {
         }
         set_in(&mut self.map, "user", "name", &settings.user_name);
         set_in(&mut self.map, "prompt", "language", &settings.language);
+        if !RESPONSES.contains(&settings.response.as_str()) {
+            return Err(Error::InvalidResponse(settings.response.clone()));
+        }
+        set_in(&mut self.map, "prompt", "response", &settings.response);
         if !THEMES.contains(&settings.theme.as_str()) {
             return Err(Error::InvalidTheme(settings.theme.clone()));
         }

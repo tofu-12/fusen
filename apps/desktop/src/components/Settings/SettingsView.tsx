@@ -31,6 +31,11 @@ const THEMES = [
   { value: "dark", label: "Dark" },
 ];
 
+const RESPONSES = [
+  { value: "chat", label: "In the chat" },
+  { value: "reply", label: "As replies to fusen" },
+];
+
 const inputClass =
   "w-full rounded border border-neutral-300 bg-transparent px-2 py-1 text-sm focus:border-sky-500 focus:outline-none dark:border-neutral-700";
 
@@ -119,6 +124,35 @@ function LanguagePicker({ value, onChange }: { value: string; onChange: (languag
           onChange={(e) => onChange(e.target.value)}
         />
       )}
+    </div>
+  );
+}
+
+/** Buttons for choosing one of a few values. */
+function Segmented({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="inline-flex rounded-md border border-neutral-300 p-0.5 text-sm dark:border-neutral-700">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          className={`rounded px-3 py-0.5 ${
+            value === o.value
+              ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900"
+              : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+          }`}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -273,25 +307,24 @@ export default function SettingsView({ settings, onSaved, onDirtyChange, onClose
           </Item>
 
           <Item
+            label="AI responses"
+            help="Where the AI answers each fusen with fusen prompt: in its reply in the chat, or as a reply to the fusen."
+            canReset={!!defaults && draft.response !== defaults.response}
+            onReset={() => defaults && setDraft({ ...draft, response: defaults.response })}
+          >
+            <Segmented
+              options={RESPONSES}
+              value={draft.response}
+              onChange={(response) => setDraft({ ...draft, response })}
+            />
+          </Item>
+
+          <Item
             label="Appearance"
             canReset={!!defaults && draft.theme !== defaults.theme}
             onReset={() => defaults && setDraft({ ...draft, theme: defaults.theme })}
           >
-            <div className="inline-flex rounded-md border border-neutral-300 p-0.5 text-sm dark:border-neutral-700">
-              {THEMES.map((t) => (
-                <button
-                  key={t.value}
-                  className={`rounded px-3 py-0.5 ${
-                    draft.theme === t.value
-                      ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900"
-                      : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
-                  }`}
-                  onClick={() => setDraft({ ...draft, theme: t.value })}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
+            <Segmented options={THEMES} value={draft.theme} onChange={(theme) => setDraft({ ...draft, theme })} />
           </Item>
 
           <Item

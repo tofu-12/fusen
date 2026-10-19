@@ -122,7 +122,7 @@ Reply to a fusen from the input field below it. Replies are listed oldest first.
 When a document changes after an `open` fusen was added, the fusen becomes `outdated` and moves to the Outdated tab.
 
 - The fusen is marked "Outdated".
-- Because its position may have moved, it is not highlighted in the document. The fusen shows the quote and line numbers from when it was added. The same applies to `closed` fusen added before the document last changed.
+- Because its position may have moved, it is not highlighted in the document. The fusen shows the quote from when it was added. The same applies to `closed` fusen added before the document last changed.
 
 ## 4. Settings
 
@@ -134,6 +134,7 @@ Changes take effect when you click Save. Each setting has a "Reset to default" b
 |---|---|---|
 | Name | Your name, recorded with your replies. | `user` |
 | Reply language | The language the AI replies in with `fusen prompt`. Choose one from the list, or choose Other… and enter it in English. | `English` |
+| AI responses | Where the AI answers each fusen with `fusen prompt`: In the chat, in its reply in the chat; or As replies to fusen, with `fusen reply` (see the [command reference](cli.md#253-output-format)). | In the chat |
 | Appearance | Light or Dark. | Light |
 | Fusen kinds | Add, edit, and delete kinds. Each kind has an ID, label, description, and color. The label defaults to the ID with its first letter capitalized. The ID cannot be changed after the kind is added, and the last kind cannot be deleted. | `comment`, `question`, `suggestion` |
 | Fusen kind color | Highlight color. Choose one of the options below, or choose any color with Custom. | Light blue |

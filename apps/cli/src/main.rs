@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
+use fusen_core::config::RESPONSES;
 use fusen_core::fusen::anchor::LineRange;
 
 /// Local Markdown review tool for AI-assisted writing.
@@ -108,6 +109,9 @@ enum Command {
         /// Include all fusen
         #[arg(long)]
         all: bool,
+        /// How the AI responds to each fusen: in the chat, or as a reply on the fusen. Defaults to prompt.response
+        #[arg(long, value_parser = RESPONSES)]
+        response: Option<String>,
     },
     /// Mark fusen as closed
     Close { file: PathBuf, ids: Vec<String> },
@@ -138,9 +142,10 @@ fn main() -> ExitCode {
                 outdated,
                 closed,
                 all,
+                response,
             }),
             _,
-        ) => commands::prompt::run(&path, copy, outdated || all, closed || all),
+        ) => commands::prompt::run(&path, copy, outdated || all, closed || all, response),
         (
             Some(Command::List {
                 path,
