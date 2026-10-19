@@ -1,0 +1,8 @@
+{
+  "name": "fusen",
+  "description": "Skills for AI agents to review Markdown documents with fusen: add fusen to a document, and reply to its open fusen.",
+  "author": { "name": "tofu-12" },
+  "homepage": "https://github.com/tofu-12/fusen",
+  "repository": "https://github.com/tofu-12/fusen",
+  "license": "MIT"
+}

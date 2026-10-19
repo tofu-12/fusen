@@ -38,6 +38,7 @@ fusen/
 ├── .cargo/config.toml          # Output directory of the generated TypeScript types
 ├── package.json                # pnpm workspace
 ├── pnpm-workspace.yaml
+├── .claude-plugin/             # Claude Code marketplace manifest
 ├── crates/
 │   └── fusen-core/             # Shared library
 │       └── src/
@@ -95,6 +96,10 @@ fusen/
 │               ├── commands.rs      # Tauri commands exposed to the UI
 │               ├── images.rs        # Images in the project, served to the preview
 │               └── watcher.rs       # File watching
+├── plugins/
+│   └── fusen/                  # Claude Code plugin
+│       ├── .claude-plugin/     # Plugin manifest
+│       └── skills/             # Agent skills: fusen-add, fusen-reply
 ├── docs/
 │   ├── cli.md
 │   ├── gui.md

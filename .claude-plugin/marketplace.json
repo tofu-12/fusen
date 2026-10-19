@@ -1,0 +1,12 @@
+{
+  "name": "fusen",
+  "owner": { "name": "tofu-12" },
+  "description": "Fusen, a review tool for Markdown documents.",
+  "plugins": [
+    {
+      "name": "fusen",
+      "source": "./plugins/fusen",
+      "description": "Skills for AI agents to review Markdown documents with fusen: add fusen to a document, and reply to its open fusen."
+    }
+  ]
+}

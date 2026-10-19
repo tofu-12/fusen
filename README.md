@@ -112,6 +112,24 @@ Paste it into your coding agent. It reads each file at the given location, edits
 
 The file format is open and documented, so other tools and agents can read and write fusen too. See the [Fusen Review Format v1](docs/fusen-format/v1.md).
 
+### Agent skills
+
+This repository is also a Claude Code plugin with two skills that let an agent review a document with fusen:
+
+| Skill | What it does |
+|---|---|
+| `fusen-add` | Reads a document and adds fusen to the passages worth pointing out. |
+| `fusen-reply` | Reads the open fusen on a document and replies to the ones it has something to add to. |
+
+The agent records its model ID, such as `claude-opus-5-5`, as the author, or its harness name, such as `claude-code` or `codex`, if it does not know the model ID. Install the plugin in Claude Code:
+
+```
+/plugin marketplace add tofu-12/fusen
+/plugin install fusen@fusen
+```
+
+Then ask, for example, `/fusen-add docs/spec.md focus on security`, or have another agent run the skill as a reviewer. The skills follow the instructions given with them. For other agents, copy the directories in [`plugins/fusen/skills/`](plugins/fusen/skills/) to where the agent looks for skills.
+
 ## Configuration
 
 Settings are stored in `~/.config/fusen/settings.json` (or `$XDG_CONFIG_HOME/fusen/settings.json` if set) and can be changed with `fusen config`:
